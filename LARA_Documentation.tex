@@ -200,14 +200,13 @@ où
 \item \texttt{answerer} est le nom de la personne qui répond aux questions ;
 \item \texttt{fb\_parser} est le chemin vers le script python.
 \end{itemize}
-L'intégralité des fichiers qui ont été traités peuvent maintenant être lu par le NLP avec \texttt{script\_java\_format} qui s'utilise comme suit :
+L'intégralité des fichiers qui ont été traités peuvent maintenant être lu par le NLP avec \texttt{script\_java\_format.sh} qui s'utilise comme suit :
 \begin{center}
 \texttt{./script\_java\_format.sh in\_folder out\_folder answerer java\_lib}
 \end{center}
 où
 \begin{itemize}
 \item \texttt{in\_folder} est le dossier contenant les sorties du parser (précédemment appelé \texttt{out\_folder}) ;
-
 \item \texttt{out\_folder} est le dossier où seront stockés les résultat du NLP ; 
 \item \texttt{answerer} est le nom de la personne qui répond aux questions ;
 \item \texttt{java\_lib} est le chemin vers le \texttt{jar} du NLP (de lara).
@@ -244,7 +243,7 @@ où
 \end{itemize}
 \tab  Lors de l'appel à \texttt{init()} les listes \texttt{questions} et \texttt{answers} vont être remplies en parcourant le fichier JSON avec les différentes variables exportées par le parser.
 \subsubsection{La classe \texttt{Simple}}
-La classe \texttt{Simple} implémente \texttt{Context} à partir d'un format de donnée très simple (sui est d'ailleurs celui exporté par \texttt{exportData(String path)} évoquée précédemment) :
+La classe \texttt{Simple} implémente \texttt{Context} à partir d'un format de donnée très simple (qui est d'ailleurs celui exporté par \texttt{exportData(String path)} évoquée précédemment) :
 \begin{center}
 \texttt{Question: \ldots} \\
 \texttt{Answer: \ldots} \\
@@ -270,7 +269,7 @@ La classe \texttt{Processer} est liée à la classe \texttt{Context}. Elle met e
 \item les URLs sont supprimées ;
 \item la langue anglaise est simplifiée ("you're" devient "you are" par exemple) ;
 \item les balises HTML sont enlevées ;
-\item les emojis sont remplacés par leur signification (via la bibliothèque `emoji4j` qui peut être retrouvée ici \href{https://github.com/kcthota/emoji4j}{ici}) ;
+\item les emojis sont remplacés par leur signification (via la bibliothèque `emoji4j` qui peut être retrouvée \href{https://github.com/kcthota/emoji4j}{ici}) ;
 \item la ponctuation est traitée par des expressions régulières ;
 \item les caractères de terminaison de ligne sont supprimés.
 \end{itemize}
@@ -348,7 +347,7 @@ Il est aussi possible de restaurer un modèle sauvegardé (via la fonction \text
 \texttt{KeyedVectors.load\_word2vec\_format(fichier.txt, binary=False)}
 \end{center}
 \subsubsection{Le script \texttt{fasttxt.py}}
-La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant être très longue, nous proposons une alternative via python et le module \texttt{gensim} (évoqué précédemment). Elle implémente l'architecture \href{https://fasttext.cc/}{FastText} de Facebook à partir d'un fichier compréhensible par la classe \texttt{Simple}. Avant de poursuivre, il est nécessaire d'installer le module \texttt{gension} via \texttt{pip} (cf la section sur le RNN). Son utilisation est précisée par \texttt{python fasttext.py -f} :
+La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant être très longue, nous proposons une alternative via python et le module \texttt{gensim} (évoqué précédemment). Elle implémente l'architecture \href{https://fasttext.cc/}{FastText} de Facebook à partir d'un fichier compréhensible par la classe \texttt{Simple}. Avant de poursuivre, il est nécessaire d'installer le module \texttt{gension} via \texttt{pip} (cf la section sur le RNN). Son utilisation est précisée par \texttt{python fasttext.py -h} :
 \begin{verbatim}
 usage: fasttext.py [-h] [--size size] [--window size] [--minCount count]
                    [--workers num] [--epochs size] [--path path]
@@ -565,9 +564,8 @@ Dans le cas contraire, il suffit d'appeler \texttt{use\_custom\_data(path)} où 
 Le word embedding exploite les exportations des modèles issus de \texttt{org.lara.nlp} et plus précisément des méthodes \texttt{write\_vectors(String path)} (converties via le script \texttt{gensim\_convert.txt /chemin/vers/le/modèle.txt}).
 \begin{itemize}
 \item \texttt{load\_word2vec(model\_path)} charge le modèle exporté par \texttt{org.lara.nlp} (cf explication ci-dessus) au format \texttt{gensim} (et plus précisément le format \texttt{KeyedVectors}) ;
-\item \texttt{fit\_tokenizer()} crée un objet de type \texttt{tf.keras.preprocessing.text.Tokenizer} à partir des questions et des réponses ;
-\item les fonction \texttt{get\_known\_words()} et \texttt{fit\_new\_tokenizer()} vont créer un nouvel objet \texttt{tf.keras.preprocessing.text.Tokenizer} où le vocabulaire est issu de l'intersection entre le vocabulaire présent dans le dataset et celui du modèle Word2Vec (ceci diminue énormément la dimensionnalité) ;
-\item \texttt{create\_embedding\_matrix()} utilise la liste des mots inconnus issus de la fonction \\ \texttt{replace\_unknown\_words()} pour assembler la matrice d'intégration (embedding matrix). Cette matrice qui a autant de lignes que de mots dans \texttt{tokenizer} associe à chaque mot un vecteur. C'est une restriction de la matrice du modèle Word2Vec.
+\item les fonction \texttt{get\_known\_words()} et \texttt{fit\_new\_tokenizer()} vont créer un nouvel objet \texttt{tf.keras.preprocessing.\\text.Tokenizer} où le vocabulaire est issu de l'intersection entre le vocabulaire présent dans le dataset et celui du modèle Word2Vec (ceci diminue énormément la dimensionnalité) ;
+\item \texttt{create\_embedding\_matrix()} assemble la matrice d'intégration (embedding matrix) à partir du nouveau \texttt{tokenizer}. Cette matrice qui a autant de lignes que de mots dans \texttt{tokenizer} associe à chaque mot un vecteur. C'est une restriction de la matrice du modèle Word2Vec.
 \end{itemize}
 \subsubsection{Modèle de l'encodeur-décodeur seq2seq}
 Le modèle seq2seq exploite 3 tableaux créés par la fonction \texttt{create\_input\_output()} :
@@ -590,13 +588,13 @@ Le fonctionnement est alors le suivant :
 \item la sortie de \texttt{decoder\_embedding} est mise à l'entrée du LSTM (initialisé avec les 2 vecteurs d'état \texttt{h} et \texttt{c} précédents) produisant ainsi les séquences de sortie ;
 \item la sortie du LSTM est alors introduite dans un ultime layer dense possédant autant de neurones que le corpus possède de mots.
 \end{itemize}
-Ce modèle est compilé par la fonction \texttt{create\_model(encoder\_input\_data, decoder\_input\_data, \\ decoder\_output\_data, use\_spatial\_dropout, use\_reccurent\_dropout, use\_batch\_normalisation)} qui retourne le modèle ainsi que \texttt{encoder\_inputs}, \texttt{encoder\_states}, \texttt{decoder\_embedding}, \texttt{decoder\_lstm}, \texttt{decoder\_dense} et \texttt{decoder\_inputs} (nécessaires pour l'inférence). Les trois derniers arguments permettent de complexifié le modèle :
+Ce modèle est compilé par la fonction \texttt{create\_model(encoder\_input\_data, decoder\_input\_data, \\ decoder\_output\_data, use\_spatial\_dropout, use\_reccurent\_dropout, use\_batch\_normalisation)} qui retourne le modèle ainsi que \texttt{encoder\_inputs}, \texttt{encoder\_states}, \texttt{decoder\_embedding}, \texttt{decoder\_lstm}, \texttt{decoder\_dense} et \texttt{decoder\_inputs} (nécessaires pour l'inférence). Les trois derniers arguments permettent de complexifier le modèle :
 \begin{itemize}
 \item \texttt{use\_spatial\_dropout} ajoute un dropout en sortie des deux layers d'embedding (il est désactivé par défaut) ;
 \item \texttt{use\_reccurent\_dropout} ajoute un dropout récurrent dans le LSTM (il est désactivé par défaut et nous prive de l'utilisation de CUDA) ; 
 \item \texttt{use\_batch\_normalisation} ajoute un layer \texttt{BatchNormalization} au niveau des deux entrées (il est activé par défaut et nécessaire dans lors de l'utilisation du modèle FastText).
 \end{itemize}
-Voici un schéma du modèle exporté via \texttt{tf.keras.utils.plot\_model} :
+Le schéma récapitulatif du modèle a été exporté via \texttt{tf.keras.utils.plot\_model}.
 \begin{figure}
 \centering
 \includegraphics[scale=0.5]{model.png}
@@ -766,8 +764,7 @@ A partir de cette étape, nous imaginerons que nous travaillons dans le dossier 
 \texttt{source venv/bin/activate}
 \end{center}
 \subsection{Parsing des données personnelles avec FacebookParser}
-Il faut décompresser l'archive Facebook dans un dossier nommé \texttt{facebook-data}. \\
-Vous devez tout d'abord télécharger LARA :
+Il faut décompresser l'archive Facebook dans un dossier nommé \texttt{facebook-data}. Ensuite, téléchargez LARA :
 \begin{center}
 \texttt{git clone https://github.com/LaraProject/lara}
 \end{center}
@@ -777,7 +774,7 @@ puis les différentes dépendances Python :
 \end{center}
 Maintenant, il faut créer les dossiers de sorties et d'entrées des différents scripts :
 \begin{center}
-\texttt{mkdir parser\_out}
+\texttt{mkdir parser\_out} \\
 \texttt{mkdir nlp\_out}
 \end{center}
 Puis il faut exécuter le parser Facebook sur chaque conversations :
@@ -818,7 +815,7 @@ puis de le nettoyer à l'aide du NLP (étape la plus longue) :
 \texttt{java -cp lara/target/laraproject-*.jar org.lara.nlp.context.SimpleTest data\_lelu\_raw.txt 0 999999 data\_lelu\_cleaned.txt}
 \end{center}
 \subsection{Entraînement du modèle Word2Vec}
-Comme détaillé plus tôt cette étape peut être réalisé de plusieurs manières différentes : avec Python ou avec Java. Il faut dans tous les cas commencer par combiner les données Facebook et LELU :
+Comme détaillé plus tôt, cette étape peut être réalisée de plusieurs manières différentes : avec Python ou avec Java. Il faut dans tous les cas commencer par combiner les données Facebook et LELU :
 \begin{center}
 \texttt{cat data\_lelu\_cleaned.txt data\_facebook\_cleaned.txt > data.txt}
 \end{center}
@@ -835,8 +832,7 @@ puis la convertir dans le bon format :
 On utilise le script \texttt{fasttext.py} :
 \begin{center}
 \texttt{pip install gensim argparse} \\
-\texttt{python lara/fasttext.py data.txt} \\
-\texttt{mv fasttext\_model\_kv.txt word2vec\_vectors.txt}
+\texttt{python lara/fasttext.py -{}-path word2vec\_vectors.txt data.txt}
 \end{center}
 \subsubsection{Avec Python via Google Collab}
 Il suffit d'importer \href{https://github.com/LaraProject/notebooks/blob/master/LaraProject_Word2Vec.ipynb}{ce notebook} qui contient toutes les instructions.
