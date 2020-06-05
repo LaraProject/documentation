@@ -154,6 +154,7 @@ Voici les paramètres : \texttt{getNbConversation(self)}. Cette méthode renvoie
 Voici les paramètres : \texttt{finalDump(self, filename)}. Cette méthode créée le fichier \texttt{.json} final qui sera utilisé par les autres modules.
 
 \subsection{Utilisation}
+\subsubsection{Le parser}
 Le parser a été conçu pour être utilisable le plus simplement possible. Pour cela une utilisation par ligne de commande a été implantée grâce à la librairie \texttt{argparse}.
 
 Il suffit d'ouvrir un terminal et de lancer la commande :
@@ -187,7 +188,30 @@ optional arguments:
                         Default: 20min
 
 \end{verbatim}
+\subsubsection{Les scripts BASH}
+Le script \texttt{script\_parsing.sh} permet d'utiliser le parser sur toutes les conversations d'un dump Facebook. Son utilisation est la suivante :
+\begin{center}
+\texttt{./script\_parsing.sh fb\_folder out\_folder answerer fb\_parser}
+\end{center}
+où
+\begin{itemize}
+\item \texttt{fb\_folder} est le dossier de décompression du dossier Facebook ;
+\item \texttt{out\_folder} est le dossier où les fichiers "parsés" seront stockés ;
+\item \texttt{answerer} est le nom de la personne qui répond aux questions ;
+\item \texttt{fb\_parser} est le chemin vers le script python.
+\end{itemize}
+L'intégralité des fichiers qui ont été traités peuvent maintenant être lu par le NLP avec \texttt{script\_java\_format} qui s'utilise comme suit :
+\begin{center}
+\texttt{./script\_java\_format.sh in\_folder out\_folder answerer java\_lib}
+\end{center}
+où
+\begin{itemize}
+\item \texttt{in\_folder} est le dossier contenant les sorties du parser (précédemment appelé \texttt{out\_folder}) ;
 
+\item \texttt{out\_folder} est le dossier où seront stockés les résultat du NLP ; 
+\item \texttt{answerer} est le nom de la personne qui répond aux questions ;
+\item \texttt{java\_lib} est le chemin vers le \texttt{jar} du NLP (de lara).
+\end{itemize}
 \section{Natural Langage Processing - NLP}
 \subsection{Objectifs et outils}
 L'objectif du module NLP est double : il doit à la fois faire toute la partie de préparation des données qui seront ensuite mises à la disposition du RNN et il doit faire toute la partie de langage processing en entraînant des algorithmes de Word2Vec. Ce package (\texttt{org.lara.nlp}), dont le code source individuel peut être retrouvé \href{https://github.com/LaraProject/nlp}{ici}, est compilé avec le logiciel Maven et fait majoritairement appel à la bibliothèque open-source de référence en Deep-Learning : \href{https://deeplearning4j.konduit.ai/}{Deeplearning4J}.
@@ -219,15 +243,36 @@ où
 \item \texttt{answerer} est le nom de la personne qui répond aux questions.
 \end{itemize}
 \tab  Lors de l'appel à \texttt{init()} les listes \texttt{questions} et \texttt{answers} vont être remplies en parcourant le fichier JSON avec les différentes variables exportées par le parser.
+\subsubsection{La classe \texttt{Simple}}
+La classe \texttt{Simple} implémente \texttt{Context} à partir d'un format de donnée très simple (sui est d'ailleurs celui exporté par \texttt{exportData(String path)} évoquée précédemment) :
+\begin{center}
+\texttt{Question: \ldots} \\
+\texttt{Answer: \ldots} \\
+\texttt{Question: \ldots} \\
+\texttt{Answer: \ldots} \\
+\end{center}
+Son constructeur est 
+\begin{center}
+\texttt{public Simple(String filename, int min\_length, int max\_length)}
+\end{center}
+où
+\begin{itemize}
+\item \texttt{min\_length} et \texttt{max\_length} sont des paramètres destinés à la classe \texttt{Processer} ;
+\item \texttt{filename} est le fichier contenant les conversations.
+\end{itemize}
+\tab  Lors de l'appel à \texttt{init()} les listes \texttt{questions} et \texttt{answers} vont être remplies en parcourant le fichier de conversations.
 \subsubsection{La classe \texttt{Processer}}
 La classe \texttt{Processer} est liée à la classe \texttt{Context}. Elle met en œuvre les méthodes permettant de nettoyer les données :
 \begin{itemize}
 \item \texttt{clean\_text(String orig)} cette fonction centrale renvoie une chaîne de caractère où plusieurs changements ont été effectués :
 \begin{itemize}
-\item suppression des caractères non-alphanumériques ;
-\item changements spécifiques à la langue anglaise (ex: "you're" devient "you are") ;
-\item suppression de sous-chaînes de caractères sans intérêt (ex: "<u>" et "</u>") ;
-\item passage du texte en minuscule
+\item les lettres du texte deviennent des minuscules ;
+\item les URLs sont supprimées ;
+\item la langue anglaise est simplifiée ("you're" devient "you are" par exemple) ;
+\item les balises HTML sont enlevées ;
+\item les emojis sont remplacés par leur signification (via la bibliothèque `emoji4j` qui peut être retrouvée ici \href{https://github.com/kcthota/emoji4j}{ici}) ;
+\item la ponctuation est traitée par des expressions régulières ;
+\item les caractères de terminaison de ligne sont supprimés.
 \end{itemize}
 \item \texttt{cleanQuestionsAnswers()} applique la fonction précédente à toutes les questions et les réponses ;
 \item \texttt{lengthFilter()} supprime les couples question/réponse où l'un ou l'autre a un nombre de mots inférieur à \texttt{min\_length} ou supérieur à \texttt{max\_length} ;
@@ -235,10 +280,13 @@ La classe \texttt{Processer} est liée à la classe \texttt{Context}. Elle met e
 \item \texttt{tokenize()} applique \texttt{tokenize\_sentence} à chaque question et à chaque réponse ;
 \item \texttt{process()} applique le filtre de longueur et le nettoyage à chaque question et à chaque réponse.
 \end{itemize}
+\subsubsection{Le parser LELU}
+\href{https://www.kaggle.com/breandan/french-reddit-discussion}{LELU} est un dataset disponible sur \href{https://www.kaggle.com/breandan/french-reddit-discussion}{Kaggle} qui regroupe $556,621$ conversations issues de Reddit. Le script \texttt{parserLELU.py} qui peut être retrouvé dans le repository \href{https://github.com/LaraProject/parserLELU}{LaraProject/parserLELU} ouvre les données de LELU et produit (via \texttt{stdout}) un fichier avec le format de \texttt{Simple}. Ce dataset sera utilisé pour l'entraînement du Word2Vec.
+
 \subsection{Les implémentations de d'algorithme de plongement lexical}
 Le NLP est aussi responsable de la tâche de plongement lexical (word embedding). Il implémente plusieurs algorithmes de \texttt{Word2Vec} via des classes très similaires mais sans héritage commun explicite. Ces classes utilisent pleinement la bibliothèque \href{https://deeplearning4j.konduit.ai/}{Deeplearning4J}. Les classes suivantes appartiennent au package \texttt{org.lara.nlp.word2vec}.
 \subsubsection{La classe \texttt{Glv} - Modèle GloVe}
-La classe \texttt{Glv} implémente le \href{https://en.wikipedia.org/wiki/GloVe_(machine_learning)}{modèle GloVe}. Son constructeur est
+La classe \texttt{Glv} implémente le \href{https://en.wikipedia.org/wiki/GloVe_(machine_learning)}{modèle GloVe}. \textbf{Malheureusement, dans la version 6 de deeplearning4j, la classe glove a été supprimée}. Son constructeur était
 \begin{center}
 \texttt{Glv(ArrayList<String> sentences)}
 \end{center}
@@ -247,7 +295,7 @@ où
 \item \texttt{sentences} est la liste des phrases des données d'entraînement
 \end{itemize}
 \tab Le réseau de neurones est initialisé avec les mêmes hyper-paramètres à chaque instance. La fonction \\
-\noindent \texttt{write\_vectors(String path)} exporte les vecteurs dans un format lisible humainement. La fonction \texttt{getModel()} retourne le modèle.
+\noindent \texttt{write\_vectors(String path)} exporte les vecteurs dans un format lisible humainement. La fonction \texttt{getModel()} retourne le modèle. Le code de cette fonction est toujours présent parmi les commits du projet.
 \subsubsection{La classe \texttt{Pv} - Paragraph Vectors}
 La classe \texttt{Pv} implémente \href{https://cs.stanford.edu/~quocle/paragraph_vector.pdf}{le modèle de ParagraphVectors (ou Doc2Vec)}. Son constructeur est 
 \begin{center}
@@ -280,7 +328,7 @@ et avec la fonction \texttt{save\_model()}. Comme les autres classes, \texttt{Sv
 \subsubsection{La classe \texttt{W2v} - Word2Vec}
 La classe \texttt{W2v} est la classe la plus utilisée dans tout le projet. Elle met en œuvre l'\href{https://patents.google.com/patent/US9037464B1/en}{algorithme Word2Vec de Google}. Son constructeur est le suivant
 \begin{center}
-\texttt{ W2v(ArrayList<String> words, int minWordFrequency, int iterations, int epochs, int dimension, double learningRate)}
+\texttt{ W2v(ArrayList<String> words, int minWordFrequency, int iterations, int epochs, int dimension)}
 \end{center}
 où
 \begin{itemize}
@@ -289,7 +337,6 @@ où
 \item \texttt{iterations} est le nombre d'itérations de l'algorithme du \texttt{Word2Vec} ;
 \item \texttt{epochs} est le nombre d'époques dans l'entraînement du réseau de neurones ;
 \item \texttt{dimension} est la taille des vecteurs ;
-\item \texttt{learningRate} est le learning rate dans le cadre de l'apprentissage via un réseau de neurones.
 \end{itemize}
 Il est aussi possible de restaurer un modèle sauvegardé (via la fonction \texttt{save\_model(String path)}) avec le constructeur
 \begin{center}
@@ -300,6 +347,27 @@ Il est aussi possible de restaurer un modèle sauvegardé (via la fonction \text
  \texttt{from gensim.models import KeyedVectors} \\
 \texttt{KeyedVectors.load\_word2vec\_format(fichier.txt, binary=False)}
 \end{center}
+\subsubsection{Le script \texttt{fasttxt.py}}
+La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant être très longue, nous proposons une alternative via python et le module \texttt{gensim} (évoqué précédemment). Elle implémente l'architecture \href{https://fasttext.cc/}{FastText} de Facebook à partir d'un fichier compréhensible par la classe \texttt{Simple}. Avant de poursuivre, il est nécessaire d'installer le module \texttt{gension} via \texttt{pip} (cf la section sur le RNN). Son utilisation est précisée par \texttt{python fasttext.py -f} :
+\begin{verbatim}
+usage: fasttext.py [-h] [--size size] [--window size] [--minCount count]
+                   [--workers num] [--epochs size] [--path path]
+                   facebook_data
+
+FastText Word Vectors
+
+positional arguments:
+  facebook_data     Path to the data
+
+optional arguments:
+  -h, --help        show this help message and exit
+  --size size       Specify the size of the word vectors
+  --window size     Specify the size of the window
+  --minCount count  Specify the minimum amount of occurence of a word
+  --workers num     Specify the number of threads dedicated to the training
+  --epochs size     Specify the number of epochs for the algorithm
+  --path path       Specify the export path of the word vectors
+\end{verbatim}
 \subsection{Compilation, tests et utilisation}
 Le module se compile grâce au gestionnaire de dépendance \href{https://maven.apache.org/}{Maven}. Il suffit d'une seule commande :
 \begin{center}
@@ -328,14 +396,31 @@ où
 \item \texttt{"Prenom Nom"} représente la personne qui répond aux questions ;
 \item \texttt{facebook\_export.txt} représente le chemin du fichier d'exportation du contexte.
 \end{itemize}
-Cette classe teste l'import, le nettoyage et l'exportation.
-\subsubsection{Test de la classe \texttt{W2v}}
-Il est possible de tester la classe \texttt{W2v} via la classe \texttt{W2vTest} à partir du corpus de Cornell (par exemple) :
+Cette classe teste l'import, le nettoyage (la longueur maximale des phrases est de 40 par défaut) et l'exportation.
+\subsubsection{Test de la classe \texttt{Simple}}
+Il est possible de tester la classe \texttt{Simple} via la classe \texttt{SimpleTest} :
+\begin{center}
+\texttt{java -cp target/laraproject-*.jar org.lara.nlp.context.SimpleTest conversations.txt min\_length max\_length conversations\_export.txt}
+\end{center}
+où
+\begin{itemize}
+\item \texttt{conversations.txt} est le fichier contenant les conversations ;
+\item \texttt{min\_length} et \texttt{max\_length} sont des paramètres destinés à la classe \texttt{Processer} ;
+\item \texttt{conversations\_export.txt} représente le chemin du fichier d'exportation du contexte.
+\end{itemize}
+Cette classe teste l'import, le nettoyage (avec les valeurs de longueur fournies) et l'exportation.
+\subsubsection{Test de la classe \texttt{W2v} avec \texttt{Cornell}}
+Il est possible de tester la classe \texttt{W2v} via la classe \texttt{W2vTest} à partir du corpus de Cornell :
 \begin{center}
 java -cp target/laraproject-*.jar org.lara.nlp.word2vec.W2vTest movie\_lines.txt movie\_conversations.txt word2vec\_vectors.txt
 \end{center}
-où \texttt{word2vec\_vectors.txt} est le chemin du fichier dans lequel seront écrits les vecteurs des mots du corpus (de dimension 300). Attention, ce test est particulièrement lent. Cette classe teste l'import, le nettoyage, la tokenisation et l'exportation de la classe \texttt{Cornel} ainsi que l'entraînement et l'export pour la classe \texttt{W2v}. Cette classe de test pourrait se généraliser à \texttt{Facebook} et s'étendre à d'autres modèles (comme \texttt{Glv}) mais nous avons décidé d'exposer uniquement les classes fondamentales.
-
+où \texttt{word2vec\_vectors.txt} est le chemin du fichier dans lequel seront écrits les vecteurs des mots du corpus (de dimension 100). Attention, ce test est particulièrement lent. Cette classe teste l'import, le nettoyage, la tokenisation et l'exportation de la classe \texttt{Cornell} ainsi que l'entraînement et l'export pour la classe \texttt{W2v}. Cette classe de test pourrait se généraliser à \texttt{Facebook} et s'étendre à d'autres modèles (comme \texttt{Glv}) mais nous avons  choisi de passer par la classe \texttt{Simple} pour cela.
+\subsubsection{Test de la classe \texttt{W2v} avec \texttt{Simple}}
+Il est possible de tester la classe \texttt{W2v} via la classe \texttt{W2vTest} à partir d'un fichier compris par \texttt{Simple}:
+\begin{center}
+java -cp target/laraproject-*.jar org.lara.nlp.word2vec.W2vSimpleTest filename.txt min\_length max\_length word2vec\_vectors.txt
+\end{center}
+où \texttt{word2vec\_vectors.txt} est le chemin du fichier dans lequel seront écrits les vecteurs des mots du corpus (de dimension 100). Attention, ce test est particulièrement lent. Cette classe teste l'import, le nettoyage, la tokenisation et l'exportation de la classe \texttt{Simple} ainsi que l'entraînement et l'export pour la classe \texttt{W2v}.
 
 
 \section{Lien entre Python et Java - RNN2Java}
@@ -463,7 +548,7 @@ L'objectif est de mettre en œuvre en Python un modèle de \href{https://arxiv.o
 \subsection{Fonctions, méthodes et modèle}
 Les variables et objets \texttt{tokenizer}, \texttt{questions}, \texttt{answers}, \texttt{vocab}, \texttt{model\_w2v}, \texttt{embedding\_matrix}, \texttt{maxlen\_questions}, \texttt{maxlen\_answers} et \texttt{VOCAB\_SIZE} sont globaux et seront manipulés par la plupart des fonctions.
 \subsubsection{Traitement des données}
-Le script réalise tout d'abord un pré-traitement des données. Celui-ci passe par plusieurs étapes :
+Dans le cas où on utilise des données autre que celles du NLP, le script réalise tout d'abord un pré-traitement des données. Celui-ci passe par plusieurs étapes :
 \begin{itemize}
 \item le téléchargement des données via \texttt{import\_data()} ;
 \item la fonction qui filtre (faiblement) les données et qui réalise la tokenisation
@@ -474,15 +559,15 @@ Le script réalise tout d'abord un pré-traitement des données. Celui-ci passe 
 \end{itemize}
 \item la fonction \texttt{clean\_text(text)} est très similaire à celle de \texttt{org.lara.nlp.context.Processer} et est appliquée sur l'intégralité de \texttt{questions} et de \texttt{answers} via l'appel à \texttt{clean\_everything()}.
 \end{itemize}
-
+Dans le cas contraire, il suffit d'appeler \texttt{use\_custom\_data(path)} où \texttt{path} est le chemin du fichier exporté par le NLP.
+ 
 \subsubsection{Word Embedding}
 Le word embedding exploite les exportations des modèles issus de \texttt{org.lara.nlp} et plus précisément des méthodes \texttt{write\_vectors(String path)} (converties via le script \texttt{gensim\_convert.txt /chemin/vers/le/modèle.txt}).
 \begin{itemize}
 \item \texttt{load\_word2vec(model\_path)} charge le modèle exporté par \texttt{org.lara.nlp} (cf explication ci-dessus) au format \texttt{gensim} (et plus précisément le format \texttt{KeyedVectors}) ;
 \item \texttt{fit\_tokenizer()} crée un objet de type \texttt{tf.keras.preprocessing.text.Tokenizer} à partir des questions et des réponses ;
-\item \texttt{fill\_vocab()} remplit la liste \texttt{vocab} à partir des mots de \texttt{tokenizer} ;
-\item \texttt{replace\_unknown\_words()} détermine les mots qui ne sont pas dans le modèle Word2Vec (variable \texttt{model\_w2v}) et les remplace dans les questions et les réponses par le token \texttt{<unk>} ;
-\item \texttt{create\_embedding\_matrix(unknown\_words)} utilise la liste des mots inconnus issus de la fonction \\ \texttt{replace\_unknown\_words()} pour assembler la matrice d'intégration (embedding matrix). Cette matrice qui a autant de lignes que de mots dans \texttt{tokenizer} associe à chaque mot un vecteur. C'est une restriction de la matrice du modèle Word2Vec.
+\item les fonction \texttt{get\_known\_words()} et \texttt{fit\_new\_tokenizer()} vont créer un nouvel objet \texttt{tf.keras.preprocessing.text.Tokenizer} où le vocabulaire est issu de l'intersection entre le vocabulaire présent dans le dataset et celui du modèle Word2Vec (ceci diminue énormément la dimensionnalité) ;
+\item \texttt{create\_embedding\_matrix()} utilise la liste des mots inconnus issus de la fonction \\ \texttt{replace\_unknown\_words()} pour assembler la matrice d'intégration (embedding matrix). Cette matrice qui a autant de lignes que de mots dans \texttt{tokenizer} associe à chaque mot un vecteur. C'est une restriction de la matrice du modèle Word2Vec.
 \end{itemize}
 \subsubsection{Modèle de l'encodeur-décodeur seq2seq}
 Le modèle seq2seq exploite 3 tableaux créés par la fonction \texttt{create\_input\_output()} :
@@ -494,7 +579,7 @@ Le modèle seq2seq exploite 3 tableaux créés par la fonction \texttt{create\_i
 \tab Le modèle seq2seq utilise 3 différentes couches (layers) :
 \begin{itemize}
 \item 2 layers d'entrée : \texttt{encoder\_input\_data} et \texttt{decoder\_input\_data} ;
-\item 2 layer d'intégration (embedding) : \texttt{encoder\_embedding} et \texttt{decoder\_embedding}. Ces layers utilisent la matrice d'intégration construite précédemment en guise de poids ;
+\item 2 layer d'intégration (embedding) : \texttt{encoder\_embedding} et \texttt{decoder\_embedding}. Ces layers utilisent la matrice d'intégration construite précédemment en guise de poids et ne participe pas à la propagation du gradient lors de l'entraînement ;
 \item 1 layer LSTM (Long-Short Term Memory) : \texttt{decoder\_lstm}.
 \end{itemize}
 Le fonctionnement est alors le suivant :
@@ -505,7 +590,19 @@ Le fonctionnement est alors le suivant :
 \item la sortie de \texttt{decoder\_embedding} est mise à l'entrée du LSTM (initialisé avec les 2 vecteurs d'état \texttt{h} et \texttt{c} précédents) produisant ainsi les séquences de sortie ;
 \item la sortie du LSTM est alors introduite dans un ultime layer dense possédant autant de neurones que le corpus possède de mots.
 \end{itemize}
-Ce modèle est compilé par la fonction \texttt{create\_model(encoder\_input\_data, decoder\_input\_data,} \\ \texttt{decoder\_output\_data)} qui retourne le modèle ainsi que \texttt{encoder\_inputs}, \texttt{encoder\_states}, \texttt{decoder\_embedding}, \texttt{decoder\_lstm}, \texttt{decoder\_dense} et \texttt{decoder\_inputs} (nécessaires pour l'inférence). L'entraînement peut être réalisé avec la fonction \texttt{train()}.
+Ce modèle est compilé par la fonction \texttt{create\_model(encoder\_input\_data, decoder\_input\_data, \\ decoder\_output\_data, use\_spatial\_dropout, use\_reccurent\_dropout, use\_batch\_normalisation)} qui retourne le modèle ainsi que \texttt{encoder\_inputs}, \texttt{encoder\_states}, \texttt{decoder\_embedding}, \texttt{decoder\_lstm}, \texttt{decoder\_dense} et \texttt{decoder\_inputs} (nécessaires pour l'inférence). Les trois derniers arguments permettent de complexifié le modèle :
+\begin{itemize}
+\item \texttt{use\_spatial\_dropout} ajoute un dropout en sortie des deux layers d'embedding (il est désactivé par défaut) ;
+\item \texttt{use\_reccurent\_dropout} ajoute un dropout récurrent dans le LSTM (il est désactivé par défaut et nous prive de l'utilisation de CUDA) ; 
+\item \texttt{use\_batch\_normalisation} ajoute un layer \texttt{BatchNormalization} au niveau des deux entrées (il est activé par défaut et nécessaire dans lors de l'utilisation du modèle FastText).
+\end{itemize}
+Voici un schéma du modèle exporté via \texttt{tf.keras.utils.plot\_model} :
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{model.png}
+\caption{Modèle du RNN}
+\end{figure}
+L'entraînement peut être réalisé avec la fonction \texttt{train(use\_spatial\_dropout, use\_reccurent\_dropout, use\_batch\_normalisation)} avec l'optimiseur \texttt{ADAM} et la fonction de coût \texttt{sparse\_categorical\_crossentropy}.
 \subsubsection{Disposition inférentielle}
 Le modèle inférentiel est légèrement complexe. Il est composé de deux modèles : le modèle inférentiel de l'encodeur \texttt{encoder\_model} et le modèle inférentiel du décodeur \texttt{decoder\_model}.
 \begin{itemize}
@@ -524,8 +621,10 @@ Les différents objets clefs de cette implémentation peuvent être exportés (e
 \begin{itemize}
 \item \texttt{save\_inference\_model(path, encoder\_inputs, encoder\_states, decoder\_embedding, decoder\_lstm, decoder\_dense, decoder\_inputs)} qui sauvergarde le modèle inférentiel dans un fichier ;
 \item \texttt{save\_tokenizer(path)} qui sauvegarde \texttt{tokenizer} via le module \texttt{pickle} dans un fichier donné ;
+\item \texttt{save\_length(path)} qui sauvegarde la longueur maximale des questions et des réponses ;
 \item \texttt{load\_inference\_model(enc\_file, dec\_file)} qui retourne un modèle inférentiel à partir d'un fichier;
-\item \texttt{load\_tokenizer(tokenizer\_file)} qui retourne un \texttt{tokenizer} à partir d'un fichier.
+\item \texttt{load\_tokenizer(tokenizer\_file)} qui retourne un \texttt{tokenizer} à partir d'un fichier ;
+\item \texttt{load\_length(length\_file)} qui retourne la longueur maximale des questions et des réponses à partir d'un fichier. 
 \end{itemize}
 
 \subsection{Utilisation}
@@ -536,19 +635,37 @@ Afin d'installer les dépendances Python, il est nécessaire d’exécuter cette
 \texttt{pip install numpy tensorflow pyyaml requests gensim argparse}
 \end{center}
 \subsubsection{Utilisation}
-Le script Python s'utilise via un système d'arguments
-\begin{center}
-\texttt{python script.py [options] word2vec\_model}
-\end{center}
-où les options sont :
-\begin{itemize}
-\item \texttt{word2vec\_model} (obligatoire) - chemin vers le modèle word2vec exporté par le NLP ;
-\item \texttt{-{}-downloadData [True/False]} indiquant si les données d'entraînement doivent être téléchargées ;
-\item \texttt{-{}-speak [True/False]} indiquant s'il faut ouvrir l'interface de discussion via le terminal ;
-\item \texttt{-{}-saveModel path} exporte le modèle dans le dossier \texttt{path} ;
-\item \texttt{-{}-loadModel path} importe le modèle à partir du dossier \texttt{path}.
-\end{itemize}
-Ceci teste l'intégralité des fonctions évoquées précédemment (dont le flot d'appel peut être suivi dans le terminal). 
+Le script Python s'utilise via un système d'arguments qui peuvent être obtenus à partir de \texttt{python script.py -h} :
+\begin{verbatim}
+usage: script.py [-h] [--downloadData [True/False]] [--customData path]
+                 [--speak [True/False]] [--saveModel path] [--loadModel path]
+                 [--useSpatialDropout [True/False]]
+                 [--useReccurentDropout [True/False]]
+                 [--useBatchNormalisation [True/False]] [--vectorSize size]
+                 word2vec_model
+
+Seq2Seq Neural Network
+
+positional arguments:
+  word2vec_model        Path to the word2vec model
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --downloadData [True/False]
+                        Specify whether the dataset should be downloaded
+  --customData path     Specify the path to the custom dataset
+  --speak [True/False]  Specify whether to speak with the Network
+  --saveModel path      Specify the path where to save the model
+  --loadModel path      Specify the path to import the model
+  --useSpatialDropout [True/False]
+                        Specify whether to use 1D spatial dropout after the
+                        embedding layers
+  --useReccurentDropout [True/False]
+                        Specify whether to use a recurrent dropout in the LSTM
+  --useBatchNormalisation [True/False]
+                        Specify whether to use batch normalisation
+  --vectorSize size     Specify the size of the word vectors
+\end{verbatim}
 
 \section{Interface graphique - GUI}
 \subsection{Objectifs et outils}
