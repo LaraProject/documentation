@@ -767,9 +767,9 @@ A partir de cette étape, nous imaginerons que nous travaillons dans le dossier 
 \end{center}
 \subsection{Parsing des données personnelles avec FacebookParser}
 Il faut décompresser l'archive Facebook dans un dossier nommé \texttt{facebook-data}. \\
-Vous devez tout d'abord télécharger le parser Facebook :
+Vous devez tout d'abord télécharger LARA :
 \begin{center}
-\texttt{git clone https://github.com/LaraProject/FacebookParser}
+\texttt{git clone https://github.com/LaraProject/lara}
 \end{center}
 puis les différentes dépendances Python :
 \begin{center}
@@ -782,14 +782,10 @@ Maintenant, il faut créer les dossiers de sorties et d'entrées des différents
 \end{center}
 Puis il faut exécuter le parser Facebook sur chaque conversations :
 \begin{center}
-\texttt{./FacebookParser/script\_parsing.sh facebook-data parser\_out "Prénom Nom" FacebookParser/parserFB.py}
+\texttt{./lara/script\_parsing.sh facebook-data parser\_out "Prénom Nom" lara/parserFB.py}
 \end{center}
 \subsection{Traitement des données personnelles avec le NLP}
-Tout d'abord, il faut télécharger le projet LARA :
-\begin{center}
-\texttt{git clone https://github.com/LaraProject/lara}
-\end{center}
-puis installer les différentes dépendances :
+Tout d'abord, il faut installer les différentes dépendances :
 \begin{center}
 \texttt{cd lara} \\
 \texttt{sudo apt install protobuf-compiler} \\
@@ -800,7 +796,7 @@ puis installer les différentes dépendances :
 \end{center}
 Puis traiter toutes les conversations :
 \begin{center}
-\texttt{./FacebookParser/script\_java\_format.sh parser\_out nlp\_out "Prénom Nom" lara/target/laraproject-*.jar}
+\texttt{./lara/script\_java\_format.sh parser\_out nlp\_out "Prénom Nom" lara/target/laraproject-*.jar}
 \end{center}
 Vous pouvez ensuite tout regrouper dans un même fichier :
 \begin{center}
@@ -850,14 +846,10 @@ Tout d'abord, installons les dépendances :
 \begin{center}
 \texttt{pip install tensorflow pyyaml requests gensim argparse}
 \end{center}
-Puis téléchargeons le code :
-\begin{center}
-\texttt{git clone https://github.com/LaraProject/seq2seq}
-\end{center}
 Il n'y a plus qu'a le lancer
 \begin{center}
 \texttt{mkdir model\_save} \\
-\texttt{python seq2seq/script.py -{}-customData data\_facebook\_cleaned.txt -{}-saveModel model\_save  word2vec\_vectors.txt} 
+\texttt{python lara/seq2seq.py -{}-customData data\_facebook\_cleaned.txt -{}-saveModel model\_save  word2vec\_vectors.txt} 
 \end{center}
 Cette commande va entraîner le RNN et sauvegarder le modèle dans le dossier \texttt{model\_save}.
 \subsubsection{Via Google Collab}
