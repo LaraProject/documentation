@@ -752,4 +752,114 @@ et de l'exécuter via
 \texttt{mvn javafx:run}
 \end{center}
 
+
+\section{Utilisation de LARA}
+Cette section détaille comment utiliser le logiciel à partir de 0.
+\subsection{Téléchargement des données Facebook}
+Afin de télécharger les conversations Messenger, il faut naviguer jusqu'à la page \texttt{Télécharger vos informations} (\texttt{Paramètres} $\longrightarrow$ \texttt{Vos informations Facebook} $\longrightarrow$ \texttt{Télécharger vos informations}). Une fois arrivé, il faut saisir \texttt{Format : JSON} et \texttt{Qualité des photos : faible}. Dans la liste \texttt{Vos données}, il faut uniquement cocher \texttt{Messages}. \\
+\tab Facebook vous enverra une notification une fois votre archive prête (cela peut mettre plusieurs heures) qu'il vous faudra télécharger afin de passer à la suite.
+\subsection{Mise en place de l'environnement Python}
+A partir de cette étape, nous imaginerons que nous travaillons dans le dossier \texttt{LARA}. Nous allons mettre en place un environnement virtuel pour nos différents scripts Python :
+\begin{center}
+\texttt{pip install virtualenv} \\
+\texttt{virtualenv venv} \\
+\texttt{source venv/bin/activate}
+\end{center}
+\subsection{Parsing des données personnelles avec FacebookParser}
+Il faut décompresser l'archive Facebook dans un dossier nommé \texttt{facebook-data}. \\
+Vous devez tout d'abord télécharger le parser Facebook :
+\begin{center}
+\texttt{git clone https://github.com/LaraProject/FacebookParser}
+\end{center}
+puis les différentes dépendances Python :
+\begin{center}
+\texttt{pip install ftfy unidecode matplotlib}
+\end{center}
+Maintenant, il faut créer les dossiers de sorties et d'entrées des différents scripts :
+\begin{center}
+\texttt{mkdir parser\_out}
+\texttt{mkdir nlp\_out}
+\end{center}
+Puis il faut exécuter le parser Facebook sur chaque conversations :
+\begin{center}
+\texttt{./FacebookParser/script\_parsing.sh facebook-data parser\_out "Prénom Nom" FacebookParser/parserFB.py}
+\end{center}
+\subsection{Traitement des données personnelles avec le NLP}
+Tout d'abord, il faut télécharger le projet LARA :
+\begin{center}
+\texttt{git clone https://github.com/LaraProject/lara}
+\end{center}
+puis installer les différentes dépendances :
+\begin{center}
+\texttt{cd lara} \\
+\texttt{sudo apt install protobuf-compiler} \\
+\texttt{make} \\
+\texttt{pip install -r requirements.txt} \\
+\texttt{mvn compile} \\
+\texttt{cd ..} \\
+\end{center}
+Puis traiter toutes les conversations :
+\begin{center}
+\texttt{./FacebookParser/script\_java\_format.sh parser\_out nlp\_out "Prénom Nom" lara/target/laraproject-*.jar}
+\end{center}
+Vous pouvez ensuite tout regrouper dans un même fichier :
+\begin{center}
+\texttt{cat nlp\_out/* > data\_facebook\_cleaned.txt}
+\end{center}
+\subsection{Traitement des données LELU avec le NLP}
+Cette section est très très longue. Il est possible de télécharger le fichier \href{https://drive.google.com/file/d/1suiEo0mGBEszMhmesoj-82Nywy2R7guF/view?usp=sharing}{data\_lelu\_cleaned.txt} directement. Dans le cas contraire, voici les différentes étapes. Il faut tout d'abord télécharger \href{https://www.kaggle.com/breandan/french-reddit-discussion}{ici} le fichier \texttt{final\_SPF\_2.xml}. Puis télécharger le parser :
+\begin{center}
+\texttt{git clone https://github.com/LaraProject/parserLELU} \\
+\texttt{mv final\_SPF\_2.xml parserLELU/}
+\end{center}
+puis exécuter le script Python :
+\begin{center}
+\texttt{pip install lxml} \\
+\texttt{python parserLELU/parserLELU.py > data\_lelu\_raw.txt}
+\end{center}
+puis de le nettoyer à l'aide du NLP (étape la plus longue) :
+\begin{center}
+\texttt{java -cp lara/target/laraproject-*.jar org.lara.nlp.context.SimpleTest data\_lelu\_raw.txt 0 999999 data\_lelu\_cleaned.txt}
+\end{center}
+\subsection{Entraînement du modèle Word2Vec}
+Comme détaillé plus tôt cette étape peut être réalisé de plusieurs manières différentes : avec Python ou avec Java. Il faut dans tous les cas commencer par combiner les données Facebook et LELU :
+\begin{center}
+\texttt{cat data\_lelu\_cleaned.txt data\_facebook\_cleaned.txt > data.txt}
+\end{center}
+\subsubsection{Avec Java}
+On utilise la classe \texttt{W2vSimpleTest} comme suit :
+\begin{center}
+\texttt{java -cp lara/target/laraproject-*.jar org.lara.nlp.word2vec.W2vSimpleTest data.txt 0 999999 word2vec\_vectors.txt}
+\end{center}
+puis la convertir dans le bon format :
+\begin{center}
+\texttt{./lara/gensim\_convert.sh word2vec\_vectors.txt}
+\end{center}
+\subsubsection{Avec Python}
+On utilise le script \texttt{fasttext.py} :
+\begin{center}
+\texttt{pip install gensim argparse} \\
+\texttt{python lara/fasttext.py data.txt} \\
+\texttt{mv fasttext\_model\_kv.txt word2vec\_vectors.txt}
+\end{center}
+\subsubsection{Avec Python via Google Collab}
+Il suffit d'importer \href{https://github.com/LaraProject/notebooks/blob/master/LaraProject_Word2Vec.ipynb}{ce notebook} qui contient toutes les instructions.
+\subsection{Entraînement du RNN}
+\subsubsection{Sur son ordinateur personnel}
+Tout d'abord, installons les dépendances :
+\begin{center}
+\texttt{pip install tensorflow pyyaml requests gensim argparse}
+\end{center}
+Puis téléchargeons le code :
+\begin{center}
+\texttt{git clone https://github.com/LaraProject/seq2seq}
+\end{center}
+Il n'y a plus qu'a le lancer
+\begin{center}
+\texttt{mkdir model\_save} \\
+\texttt{python seq2seq/script.py -{}-customData data\_facebook\_cleaned.txt -{}-saveModel model\_save  word2vec\_vectors.txt} 
+\end{center}
+Cette commande va entraîner le RNN et sauvegarder le modèle dans le dossier \texttt{model\_save}.
+\subsubsection{Via Google Collab}
+Il suffit d'importer \href{https://github.com/LaraProject/notebooks/blob/master/LaraProject_RNN.ipynb}{ce notebook} qui contient toutes les instructions.
 \end{document}
