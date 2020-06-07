@@ -22,6 +22,18 @@
 
 \newpage
 
+\section{Introduction}
+L.A.R.A est un logiciel complet mettant en œuvre un agent conversationnel entraîné sur des discussions issues de Facebook. Ce logiciel repose notamment sur les bibliothèques \href{https://deeplearning4j.org/}{Deeplearning4J} et \href{https://openjfx.io/}{JavaFX} pour Java ainsi que sur les bibliothèques \href{https://www.tensorflow.org/}{Tensorflow} et \href{https://keras.io/}{Keras} pour python. Toutes ces bibliothèques sont utilisées dans leurs plus récentes versions au mois de Juin 2020. L'intégralité du code est opensource et peut être consulté sur \href{https://github.com/LaraProject}{le github LaraProject}. \\
+\tab L.A.R.A est découpé en plusieurs modules :
+\begin{itemize}
+\item Facebook Parser
+\item Natural Langage Processing
+\item RNN2Java
+\item Réseau récursif de neurones
+\item Interface graphique
+\end{itemize}
+Le fonctionnement de chaque module, leur utilisation ainsi que leurs liens avec les autres modules sont expliqués dans les moindres détails afin d'exposer toute la flexibilité du logiciel. Dans la dernière section, un tutoriel simple explique comment utiliser le logiciel sans aucunes ressources initiales avec les paramètres par défaut.
+ 
 \section{Facebook Parser}
 \subsection{Objectifs et outils}
 Nous avons décidé de travailler tout au long de ce projet en ayant comme objectif d'entraîner notre programme sur nos données personnelles, extraites notamment de nos conversations Facebook. Ainsi le parser qui a été développé est l'un des modules critiques qui forment la version actuelle de L.A.R.A.
@@ -534,7 +546,8 @@ Une fois toutes ces étapes effectuées, assurez-vous que les sauvegardes du RNN
 \begin{center}
 	\texttt{models/\#\#/model\_enc.h5} \\
 	\texttt{models/\#\#/model\_dec.h5} \\
-	\texttt{models/\#\#/tokenizer.pickle}
+	\texttt{models/\#\#/tokenizer.pickle} \\
+	\texttt{models/\#\#/length.txt}
 \end{center}
 où \texttt{\#\#} est le numéro de la sauvegarde (commençant à 1).
 \subsubsection{Utilisation}
@@ -896,5 +909,29 @@ Il faut choisir entre l'approche 1 et l'approche 2. L'approche 2 est significati
 \subsubsection{Via Google Collab}
 Il suffit d'importer \href{https://github.com/LaraProject/notebooks/blob/master/LaraProject_RNN.ipynb}{ce notebook} qui contient toutes les instructions.
 
+\subsection{Intégration des fichiers exportés par le RNN dans LARA}
+A partir des fichiers exportés par le RNN, il faut former l’arborescence suivante
+\begin{center}
+	\texttt{lara/models/\#\#/model\_enc.h5} \\
+	\texttt{lara/models/\#\#/model\_dec.h5} \\
+	\texttt{lara/models/\#\#/tokenizer.pickle} \\
+	\texttt{lara/models/\#\#/length.txt}
+\end{center}
+où \texttt{\#\#} correspond au numéro de la personne (c'est numéro commence à $1$, si aucun numéro n'a été explicitement attribué, il faut mettre le numéro existant $+1$).
 
+\subsection{Exécution et accès à l'interface graphique}
+Afin d'exécuter LARA, il faut ouvrir deux terminaux distincts. Attention dans chaque terminal veillez à être dans le bon dossier \texttt{\$ LARA/lara} et d'utiliser l'environnement virtuel python \texttt{\$ source ../venv/bin/activate}.
+\subsubsection{Premier terminal : le serveur}
+Pour allumer le serveur, il suffit d’exécuter le script python depuis le dossier \texttt{python} :
+\begin{center}
+	\texttt{\$ cd python} \\
+	\texttt{\$ python main.py}
+\end{center}
+En cas de problème de port déjà occupé, il peut être changé aux lignes suivantes \texttt{lara/src/main/java/org/lara/rnn/\\Server.java:11} (côté client) et \texttt{python/main.py:70} (côté serveur).
+\subsubsection{Second terminal : le client}
+Il suffit d'utiliser maven pour appeler le script JavaFX :
+\begin{center}
+	\texttt{\$ mvn javafx:run}
+\end{center}
+Il vous est désormais possible de discuter avec les membres de LARA.
 \end{document}
