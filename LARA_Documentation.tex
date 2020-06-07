@@ -20,13 +20,17 @@
 \maketitle
 \tableofcontents
 
+\newpage
+
 \section{Facebook Parser}
 \subsection{Objectifs et outils}
 Nous avons décidé de travailler tout au long de ce projet en ayant comme objectif d'entraîner notre programme sur nos données personnelles, extraites notamment de nos conversations Facebook. Ainsi le parser qui a été développé est l'un des modules critiques qui forment la version actuelle de L.A.R.A.
 
-Son rôle est d'ordonner et organiser le dump de données que nous pouvons télécharger sur facebook de manière à en faire un dataset d'entraînement et de validation valide pour les prochains modules de la chaîne.
+Son rôle est d'ordonner et organiser le dump de données que nous pouvons télécharger sur Facebook de manière à en faire un dataset d'entraînement et de validation valide pour les prochains modules qui composent le projet LARA.
+
 \subsection{Traitement des données}
 Le parser opère sur le dump FaceBook un ensemble d'opérations dont il est possible de voir le résultat dans cette partie.
+
 \subsubsection{Données initiales}
 Données extraites du fichier \texttt{dumpFacebook.json}.
 \begin{verbatim}
@@ -66,7 +70,7 @@ Données produites par le parser après traitement.
 \end{verbatim}
 \subsection{Programme}
 \subsubsection{Constructeur de la classe \texttt{Parser}}
-Le parser facebok est construit autour d'une classe \texttt{Parser}. Son constructeur initialise les variables de la classe avec les valeurs qui lui sont transmises et s'occupe de charger en mémoire le contenu du dump téléchargé sur Facebook.  Voici son constructeur :
+Le parser Facebok est construit autour d'une classe \texttt{Parser}. Son constructeur initialise les variables de la classe avec les valeurs qui lui sont transmises et s'occupe de charger en mémoire le contenu du dump téléchargé sur Facebook.  Voici son constructeur :
 \begin{center}
 	\texttt{\_\_init\_\_(self, fileName, nbMessages, delayBetween2Conv, answerer, withTimestamp=True, debug=False)}
 \end{center}
@@ -82,11 +86,11 @@ Le parser facebok est construit autour d'une classe \texttt{Parser}. Son constru
 \end{itemize}
 
 \subsubsection{La méthode \texttt{start}}
-La méthode \texttt{start} est l'une des methodes les plus importante de la classe, elle ne prend aucun argument. Elle initialise deux listes \texttt{self.conversation['speakers']} et \texttt{self.conversation['messages']} qui contiendront respectivement la liste des participants à la conversation et ainsi que son contenu.
+La méthode \texttt{start} est l'une des méthodes les plus importantes de la classe ; elle ne prend aucun argument. Elle initialise deux listes \texttt{self.conversation['speakers']} et \texttt{self.conversation['messages']} qui contiendront respectivement la liste des participants à la conversation et son contenu.
 
 Dans un premier temps, on remplit la liste \texttt{conversation.['speakers']} simplement en se basant sur le champ \texttt{conversation['participants']} du dump JSON. Vient ensuite le problème de la gestion des messages. Dans un premier temps, nous devons vérifier l'utilisabilité du dump.
 
-Pour cela on itère sur chaque élément du dump et on vérifie que l'élément en question est bien un message en utilisant la methode \texttt{self.getMsg()}. Dans le cas où c'est bien un message on peut l'ajouter dans la liste \texttt{self.conversation['message']}, dans le cas contraire on émet un message d'erreur.
+Pour cela on itère sur chaque élément du dump et on vérifie que l'élément en question est bien un message en utilisant la methode \texttt{self.getMsg()}. Dans le cas où c'est bien un message, on peut l'ajouter dans la liste \texttt{self.conversation['message']}, dans le cas contraire on émet un message d'erreur.
 
 Au vu de la grande variété possible des différents messages (text, emoji, réaction, image, vidéo, ...), nous devons passer par une phase de nettoyage en amont afin de réduire nos données à quelque chose d'utilisable par les autres modules et notamment pour le réseau de neuronnes.
 
@@ -98,7 +102,7 @@ On décide ainsi de trier les messages par leur timestamps afin de les ordonner 
 
 Pendant la création de la conversation, repérée par son \texttt{id}, on vérifie certaines conditions pour assurer la validité de la conversation.
 
-Ainsi, une nouvelle conversation doit obligatoirement commencer par une question et la conversation précédente doit terminer par une réponse. On fera aussi attention à éviter les conversations de type monologue où il n'y a pas d'échange entre les deux participants. Quand une de ces conditions n'est pas vérifiée, on supprime simplement la conversation en question.
+Ainsi, \textbf{une nouvelle conversation doit obligatoirement commencer par une question et la conversation précédente doit se terminer par une réponse}. On fera aussi attention à éviter les conversations de type monologue où il n'y a pas d'échange entre les deux participants. Quand une de ces conditions n'est pas vérifiée, on supprime simplement la conversation en question.
 
 Voici une représentation simplifiée de l'attribution des \texttt{ids} par le parser :
 
@@ -114,16 +118,16 @@ Voici une représentation simplifiée de l'attribution des \texttt{ids} par le p
 \end{verbatim}
 
 \subsubsection{La méthode \texttt{isAnswerer}}
-Voici les paramètres : \texttt{isAnswerer(self, name)}. Il s'agit d'une methode simple qui renvoie un boolean résultant de cette opération : \texttt{name == self.answerer}.
+Voici les paramètres : \texttt{isAnswerer(self, name)}. Il s'agit d'une méthode simple qui renvoie le booléen résultant de cette opération : \texttt{name == self.answerer}.
 
 \subsubsection{La méthode \texttt{removeFullConv}}
-Voici les paramètres : \texttt{removeFullConv(self, conv\_id)}. Cette methode permet de supprimer une conversation entière grâce à son \texttt{id}.
+Voici les paramètres : \texttt{removeFullConv(self, conv\_id)}. Cette méthode permet de supprimer une conversation entière grâce à son \texttt{id}.
 
 \subsubsection{La méthode \texttt{removeSubConv}}
-Voici les paramètres : \texttt{removeSubConv(self, conv\_id, subconv\_id)}. Cette methode permet de supprimer un message d'une conversation grâce à son \texttt{id}.
+Voici les paramètres : \texttt{removeSubConv(self, conv\_id, subconv\_id)}. Cette méthode permet de supprimer un message d'une conversation grâce à son \texttt{id}.
 
 \subsubsection{La méthode \texttt{getMsg}}
-Voici les paramètres : \texttt{getMsg(self, k, conversationId, subConversationId)}. Cette methode se charge de renvoyer un message structuré de type dictionnaire selon python.
+Voici les paramètres : \texttt{getMsg(self, k, conversationId, subConversationId)}. Cette méthode se charge de renvoyer un message structuré de type dictionnaire (tel que défini par Python).
 
 Voici un extrait du code :
 \begin{lstlisting}[language=Python]
@@ -137,21 +141,21 @@ if self.withTimestamp:
 }
 \end{lstlisting}
 
-Si le champ \texttt{self.withTimestamp} vaut \texttt{False}, il suffit de retirer cette ligne. Dans le cas où le le message reçu n'est pas interpretable (message video, audio, réaction, ...) alors la fonction \texttt{self.cleanMsg} renvoie une erreur qui nous fait sortir d'un \texttt{try} nous permettant ainsi de pouvoir catch l'erreur dans le \texttt{except} et de supprimer ce message.
+Si le champ \texttt{self.withTimestamp} vaut \texttt{False}, il suffit de retirer cette ligne. Dans le cas où le le message reçu n'est pas interprétable (message video, audio, réaction, ...) alors la fonction \texttt{self.cleanMsg} renvoie une erreur, ce qui entraîne la sortie d'un \texttt{try} et permet le catch de l'erreur dans le \texttt{except} ; le message est alors supprimé.
 
 On renvoie finalement soit \texttt{msg} si tout s'est bien déroulé, soit l'\texttt{id} du message qui a causé l'erreur.
 
 \subsubsection{La méthode \texttt{cleanMsg}}
-Voici les paramètres : \texttt{cleanMessage(self, message)}. Cette methode renvoie le message sous forme de chaîne de caractères après avoir subit quelques transformations. Le but étant de transformer les caractères encodés par Facebook et de supprimer les majuscules du text.
+Voici les paramètres : \texttt{cleanMessage(self, message)}. Cette méthode renvoie le message sous forme de chaîne de caractères après avoir subi quelques transformations. Le but étant de transformer les caractères encodés par Facebook et de supprimer les majuscules du texte.
 
 \subsubsection{La méthode \texttt{extract\_time}}
-Voici les paramètres : \texttt{extract\_time(self, msg)}. Cette méthode renvoie le timestamp associ au message. Dans le cas où celui-ci n'est pas défini, on renvoie la valeur \texttt{0}.
+Voici les paramètres : \texttt{extract\_time(self, msg)}. Cette méthode renvoie le timestamp associé au message. Dans le cas où celui-ci n'est pas défini, on renvoie la valeur \texttt{0}.
 
 \subsubsection{La méthode \texttt{getNbConversation}}
 Voici les paramètres : \texttt{getNbConversation(self)}. Cette méthode renvoie le nombre de messages enregistrés dans la lists \texttt{self.conversations['messages']}.
 
 \subsubsection{La méthode \texttt{finalDump}}
-Voici les paramètres : \texttt{finalDump(self, filename)}. Cette méthode créée le fichier \texttt{.json} final qui sera utilisé par les autres modules.
+Voici les paramètres : \texttt{finalDump(self, filename)}. Cette méthode crée le fichier \texttt{.json} final qui sera utilisé par les autres modules.
 
 \subsection{Utilisation}
 \subsubsection{Le parser}
@@ -169,12 +173,19 @@ Cette commande peut-être enrichie en donnant des arguments supplémentaires opt
 	\texttt{\$ python3 parserFB.py inputFile outputFile answerer --nbMessages [int] --debug [True/False] --withTimestamp [True/False] --delayBetween2Conv [int]}
 \end{center}
 
-Voici ce que renvoie la commande \texttt{\$ python3 parserFB -h}.
+Voici ce que renvoie la commande \texttt{\$ python3 parserFB -h} :
 
 \begin{verbatim}
+usage: parserFB.py [-h] [--nbMessages [integer]] [--debug [True/False]]
+                   [--withTimestamp [True/False]]
+                   [--delayBetween2Conv [time_in_seconds]]
+                   [--export file_export]
+                   file answerer
+
+Faceboot data parser
+
 positional arguments:
-  inputFile             Path to input file containing facebook data
-  outputFile            Path to output file
+  file                  Path to file containing facebook data
   answerer              Who will answer your questions
 
 optional arguments:
@@ -186,6 +197,7 @@ optional arguments:
                         Default: False
   --delayBetween2Conv [time_in_seconds]
                         Default: 20min
+  --export file_export  Default: None
 
 \end{verbatim}
 \subsubsection{Les scripts BASH}
@@ -200,7 +212,7 @@ où
 	\item \texttt{answerer} est le nom de la personne qui répond aux questions ;
 	\item \texttt{fb\_parser} est le chemin vers le script python.
 \end{itemize}
-L'intégralité des fichiers qui ont été traités peuvent maintenant être lu par le NLP avec \texttt{script\_java\_format.sh} qui s'utilise comme suit :
+L'intégralité des fichiers qui ont été traités peuvent maintenant être lus par le NLP avec \texttt{script\_java\_format.sh} qui s'utilise comme suit :
 \begin{center}
 	\texttt{./script\_java\_format.sh in\_folder out\_folder answerer java\_lib}
 \end{center}
@@ -211,13 +223,16 @@ où
 	\item \texttt{answerer} est le nom de la personne qui répond aux questions ;
 	\item \texttt{java\_lib} est le chemin vers le \texttt{jar} du NLP (de lara).
 \end{itemize}
+
 \section{Natural Langage Processing - NLP}
 \subsection{Objectifs et outils}
-L'objectif du module NLP est double : il doit à la fois faire toute la partie de préparation des données qui seront ensuite mises à la disposition du RNN et il doit faire toute la partie de langage processing en entraînant des algorithmes de Word2Vec. Ce package (\texttt{org.lara.nlp}), dont le code source individuel peut être retrouvé \href{https://github.com/LaraProject/nlp}{ici}, est compilé avec le logiciel Maven et fait majoritairement appel à la bibliothèque open-source de référence en Deep-Learning : \href{https://deeplearning4j.konduit.ai/}{Deeplearning4J}.
+L'objectif du module NLP est double : il doit à la fois faire toute la partie de préparation des données qui seront ensuite mises à la disposition du RNN, et il doit faire toute la partie de langage processing en entraînant des algorithmes de Word2Vec. Ce package (\texttt{org.lara.nlp}), dont le code source individuel peut être retrouvé \href{https://github.com/LaraProject/nlp}{ici}, est compilé avec le logiciel Maven et fait majoritairement appel à la bibliothèque open-source de référence en Deep Learning : \href{https://deeplearning4j.konduit.ai/}{Deeplearning4J}.
+
 \subsection{La classe \texttt{Context}}
 La classe abstraite \texttt{Context} (\texttt{org.lara.nlp.context.Context}) permet de réaliser la préparation des données. Elle a été implémentée par deux classes filles : \texttt{Facebook}, qui exploite les données issues du parser et \texttt{Cornell}, qui exploite les données issues du \href{https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html}{corpus de Cornell}. L'objectif est de fournir à partir de ces différentes sources deux listes de même taille : l'une contenant les questions et l'autre des réponses ; toutes deux parfaitement nettoyées (nous détaillerons ce nettoyage plus tard). \\
-\tab La méthode \texttt{init()} permet d'initialiser l'objet en remplissant ces deux listes. Les deux listes peuvent ensuite être "tokenizées" (cf RNN) avec \texttt{tokenize()} ou nettoyées \texttt{cleaning()} (cf \texttt{Processer}). \\
+\tab La méthode \texttt{init()} permet d'initialiser l'objet en remplissant ces deux listes. Les deux listes peuvent ensuite être "tokenizées" avec \texttt{tokenize()} (cf. \texttt{RNN}), ou nettoyées avec \texttt{cleaning()} (cf. \texttt{Processer}). \\
 \tab Les données peuvent être exportées et importées avec les méthodes \texttt{save(String path\_questions, String path\_answers)} et \texttt{restore(String path\_questions, String path\_answers)}. Il est aussi possible d'exporter ces deux listes dans un même fichier via \texttt{exportData(String path)} (cette méthode sera utilisée dans pour le RNN).
+
 \subsubsection{La classe \texttt{Cornell}}
 La classe \texttt{Cornell} implémente \texttt{Context} pour le \href{https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html}{corpus de Cornell}. Son contructeur est
 \begin{center}
@@ -242,6 +257,7 @@ où
 	\item \texttt{answerer} est le nom de la personne qui répond aux questions.
 \end{itemize}
 \tab  Lors de l'appel à \texttt{init()} les listes \texttt{questions} et \texttt{answers} vont être remplies en parcourant le fichier JSON avec les différentes variables exportées par le parser.
+
 \subsubsection{La classe \texttt{Simple}}
 La classe \texttt{Simple} implémente \texttt{Context} à partir d'un format de donnée très simple (qui est d'ailleurs celui exporté par \texttt{exportData(String path)} évoquée précédemment) :
 \begin{center}
@@ -260,6 +276,7 @@ où
 	\item \texttt{filename} est le fichier contenant les conversations.
 \end{itemize}
 \tab  Lors de l'appel à \texttt{init()} les listes \texttt{questions} et \texttt{answers} vont être remplies en parcourant le fichier de conversations.
+
 \subsubsection{La classe \texttt{Processer}}
 La classe \texttt{Processer} est liée à la classe \texttt{Context}. Elle met en œuvre les méthodes permettant de nettoyer les données :
 \begin{itemize}
@@ -279,11 +296,13 @@ La classe \texttt{Processer} est liée à la classe \texttt{Context}. Elle met e
 	\item \texttt{tokenize()} applique \texttt{tokenize\_sentence} à chaque question et à chaque réponse ;
 	\item \texttt{process()} applique le filtre de longueur et le nettoyage à chaque question et à chaque réponse.
 \end{itemize}
+
 \subsubsection{Le parser LELU}
 \href{https://www.kaggle.com/breandan/french-reddit-discussion}{LELU} est un dataset disponible sur \href{https://www.kaggle.com/breandan/french-reddit-discussion}{Kaggle} qui regroupe $556,621$ conversations issues de Reddit. Le script \texttt{parserLELU.py} qui peut être retrouvé dans le repository \href{https://github.com/LaraProject/parserLELU}{LaraProject/parserLELU} ouvre les données de LELU et produit (via \texttt{stdout}) un fichier avec le format de \texttt{Simple}. Ce dataset sera utilisé pour l'entraînement du Word2Vec.
 
-\subsection{Les implémentations de d'algorithme de plongement lexical}
+\subsection{Les implémentations de l'algorithme de plongement lexical}
 Le NLP est aussi responsable de la tâche de plongement lexical (word embedding). Il implémente plusieurs algorithmes de \texttt{Word2Vec} via des classes très similaires mais sans héritage commun explicite. Ces classes utilisent pleinement la bibliothèque \href{https://deeplearning4j.konduit.ai/}{Deeplearning4J}. Les classes suivantes appartiennent au package \texttt{org.lara.nlp.word2vec}.
+
 \subsubsection{La classe \texttt{Glv} - Modèle GloVe}
 La classe \texttt{Glv} implémente le \href{https://en.wikipedia.org/wiki/GloVe_(machine_learning)}{modèle GloVe}. \textbf{Malheureusement, dans la version 6 de deeplearning4j, la classe glove a été supprimée}. Son constructeur était
 \begin{center}
@@ -295,6 +314,7 @@ où
 \end{itemize}
 \tab Le réseau de neurones est initialisé avec les mêmes hyper-paramètres à chaque instance. La fonction \\
 \noindent \texttt{write\_vectors(String path)} exporte les vecteurs dans un format lisible humainement. La fonction \texttt{getModel()} retourne le modèle. Le code de cette fonction est toujours présent parmi les commits du projet.
+
 \subsubsection{La classe \texttt{Pv} - Paragraph Vectors}
 La classe \texttt{Pv} implémente \href{https://cs.stanford.edu/~quocle/paragraph_vector.pdf}{le modèle de ParagraphVectors (ou Doc2Vec)}. Son constructeur est
 \begin{center}
@@ -309,6 +329,7 @@ où
 	\texttt{Pv(String path)}
 \end{center}
 qui permet de restaurer un modèle précédemment sauvegardé à l'aide de \texttt{save\_model(String path)}. Les fonctions \texttt{write\_vectors(String path)} et \texttt{getModel()} sont aussi présentes dans cette classe.
+
 \subsubsection{La classe \texttt{Sv} - Sequence Vectors}
 La classe \texttt{Sv} implémente de l'extraction de caractéristiques abstraites pour des instances du type \texttt{Sequences} et \texttt{SequenceElements}, en utilisant les algorithmes SkipGram, CBOW ou DBOW. Son constructeur est
 \begin{center}
@@ -324,6 +345,7 @@ Tous les hyper-paramètres de l'algorithme sont fixés.\\
 	\texttt{Sv(String path)}
 \end{center}
 et avec la fonction \texttt{save\_model()}. Comme les autres classes, \texttt{Sv} possède les fonctions \texttt{write\_vectors(String path)} et \texttt{getModel()}.
+
 \subsubsection{La classe \texttt{W2v} - Word2Vec}
 La classe \texttt{W2v} est la classe la plus utilisée dans tout le projet. Elle met en œuvre l'\href{https://patents.google.com/patent/US9037464B1/en}{algorithme Word2Vec de Google}. Son constructeur est le suivant
 \begin{center}
@@ -332,7 +354,7 @@ La classe \texttt{W2v} est la classe la plus utilisée dans tout le projet. Elle
 où
 \begin{itemize}
 	\item \texttt{words} est la liste des phrases des données d'entraînement ;
-	\item \texttt{minWordFrequency} est le nombre minimal d'occurence d'un mot pour qu'il soit considéré ;
+	\item \texttt{minWordFrequency} est le nombre minimal d'occurences d'un mot pour qu'il soit considéré ;
 	\item \texttt{iterations} est le nombre d'itérations de l'algorithme du \texttt{Word2Vec} ;
 	\item \texttt{epochs} est le nombre d'époques dans l'entraînement du réseau de neurones ;
 	\item \texttt{dimension} est la taille des vecteurs ;
@@ -351,6 +373,7 @@ La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant ê
 \begin{verbatim}
 usage: fasttext.py [-h] [--size size] [--window size] [--minCount count]
                    [--workers num] [--epochs size] [--path path]
+                   [--modelPath path]
                    facebook_data
 
 FastText Word Vectors
@@ -366,6 +389,7 @@ optional arguments:
   --workers num     Specify the number of threads dedicated to the training
   --epochs size     Specify the number of epochs for the algorithm
   --path path       Specify the export path of the word vectors
+  --modelPath path  Specify the export path of the FastText model
 \end{verbatim}
 \subsection{Compilation, tests et utilisation}
 Le module se compile grâce au gestionnaire de dépendance \href{https://maven.apache.org/}{Maven}. Il suffit d'une seule commande :
@@ -373,21 +397,22 @@ Le module se compile grâce au gestionnaire de dépendance \href{https://maven.a
 	\texttt{mvn package}
 \end{center}
 Nous allons détailler ci-dessous les classes de test des fonctionnalités principales.
+
 \subsubsection{Test de la classe \texttt{Cornell}}
 Il est possible de tester la classe \texttt{Cornell} via la classe \texttt{CornellTest} :
 \begin{center}
-	\texttt{java -cp target/laraproject-*.jar org.lara.nlp.context.CornellTest movie\_lines.txt movie\_conversations.txt cornell\_export.txt}
+	\texttt{\$ java -cp target/laraproject-*.jar org.lara.nlp.context.CornellTest movie\_lines.txt movie\_conversations.txt cornell\_export.txt}
 \end{center}
 où
 \begin{itemize}
 	\item \texttt{movie\_lines.txt} et \texttt{movie\_conversations.txt} proviennent du \href{https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html}{corpus de Cornell} ;
 	\item \texttt{cornell\_export.txt} représente le chemin du fichier d'exportation du contexte.
 \end{itemize}
-Cette classe teste l'import, le nettoyage et l'exportation.
+Cette classe teste l'importation, le nettoyage et l'exportation.
 \subsubsection{Test de la classe \texttt{Facebook}}
 Il est possible de tester la classe \texttt{Facebook} via la classe \texttt{FacebookTest} :
 \begin{center}
-	\texttt{java -cp target/laraproject-*.jar org.lara.nlp.context.FacebookTest parser\_export.js "Prenom Nom" facebook\_export.txt}
+	\texttt{\$ java -cp target/laraproject-*.jar org.lara.nlp.context.FacebookTest parser\_export.js "Prenom Nom" facebook\_export.txt}
 \end{center}
 où
 \begin{itemize}
@@ -395,11 +420,11 @@ où
 	\item \texttt{"Prenom Nom"} représente la personne qui répond aux questions ;
 	\item \texttt{facebook\_export.txt} représente le chemin du fichier d'exportation du contexte.
 \end{itemize}
-Cette classe teste l'import, le nettoyage (la longueur maximale des phrases est de 40 par défaut) et l'exportation.
+Cette classe teste l'importation, le nettoyage (la longueur maximale des phrases est de 40 par défaut) et l'exportation.
 \subsubsection{Test de la classe \texttt{Simple}}
 Il est possible de tester la classe \texttt{Simple} via la classe \texttt{SimpleTest} :
 \begin{center}
-	\texttt{java -cp target/laraproject-*.jar org.lara.nlp.context.SimpleTest conversations.txt min\_length max\_length conversations\_export.txt}
+	\texttt{\$ java -cp target/laraproject-*.jar org.lara.nlp.context.SimpleTest conversations.txt min\_length max\_length conversations\_export.txt}
 \end{center}
 où
 \begin{itemize}
@@ -407,19 +432,19 @@ où
 	\item \texttt{min\_length} et \texttt{max\_length} sont des paramètres destinés à la classe \texttt{Processer} ;
 	\item \texttt{conversations\_export.txt} représente le chemin du fichier d'exportation du contexte.
 \end{itemize}
-Cette classe teste l'import, le nettoyage (avec les valeurs de longueur fournies) et l'exportation.
+Cette classe teste l'importation, le nettoyage (avec les valeurs de longueur fournies) et l'exportation.
 \subsubsection{Test de la classe \texttt{W2v} avec \texttt{Cornell}}
 Il est possible de tester la classe \texttt{W2v} via la classe \texttt{W2vTest} à partir du corpus de Cornell :
 \begin{center}
-	java -cp target/laraproject-*.jar org.lara.nlp.word2vec.W2vTest movie\_lines.txt movie\_conversations.txt word2vec\_vectors.txt
+	\texttt{\$ java -cp target/laraproject-*.jar org.lara.nlp.word2vec.W2vTest movie\_lines.txt movie\_conversations.txt word2vec\_vectors.txt}
 \end{center}
-où \texttt{word2vec\_vectors.txt} est le chemin du fichier dans lequel seront écrits les vecteurs des mots du corpus (de dimension 100). Attention, ce test est particulièrement lent. Cette classe teste l'import, le nettoyage, la tokenisation et l'exportation de la classe \texttt{Cornell} ainsi que l'entraînement et l'export pour la classe \texttt{W2v}. Cette classe de test pourrait se généraliser à \texttt{Facebook} et s'étendre à d'autres modèles (comme \texttt{Glv}) mais nous avons  choisi de passer par la classe \texttt{Simple} pour cela.
+où \texttt{word2vec\_vectors.txt} est le chemin du fichier dans lequel seront écrits les vecteurs des mots du corpus (de dimension 100). Attention, ce test est particulièrement lent. Cette classe teste l'importation, le nettoyage, la tokenisation et l'exportation de la classe \texttt{Cornell} ainsi que l'entraînement et l'export pour la classe \texttt{W2v}. Cette classe de test pourrait se généraliser à \texttt{Facebook} et s'étendre à d'autres modèles (comme \texttt{Glv}) mais nous avons  choisi de passer par la classe \texttt{Simple} pour cela.
 \subsubsection{Test de la classe \texttt{W2v} avec \texttt{Simple}}
 Il est possible de tester la classe \texttt{W2v} via la classe \texttt{W2vTest} à partir d'un fichier compris par \texttt{Simple}:
 \begin{center}
-	java -cp target/laraproject-*.jar org.lara.nlp.word2vec.W2vSimpleTest filename.txt min\_length max\_length word2vec\_vectors.txt
+	\texttt{\$ java -cp target/laraproject-*.jar org.lara.nlp.word2vec.W2vSimpleTest filename.txt min\_length max\_length word2vec\_vectors.txt}
 \end{center}
-où \texttt{word2vec\_vectors.txt} est le chemin du fichier dans lequel seront écrits les vecteurs des mots du corpus (de dimension 100). Attention, ce test est particulièrement lent. Cette classe teste l'import, le nettoyage, la tokenisation et l'exportation de la classe \texttt{Simple} ainsi que l'entraînement et l'export pour la classe \texttt{W2v}.
+où \texttt{word2vec\_vectors.txt} est le chemin du fichier dans lequel seront écrits les vecteurs des mots du corpus (de dimension 100). Attention, ce test est particulièrement lent. Cette classe teste l'importation, le nettoyage, la tokenisation et l'exportation de la classe \texttt{Simple} ainsi que l'entraînement et l'export pour la classe \texttt{W2v}.
 
 
 \section{Lien entre Python et Java - RNN2Java}
@@ -437,13 +462,11 @@ L'objectif est donc de mettre en place une API ayant les propriétés suivantes 
 	\item être facilement exploitable en Python et en Java ;
 	\item être très simple et facilement extensible ;
 \end{itemize}
-Nous avons donc choisi de nous orienter vers l'outil \href{https://developers.google.com/protocol-buffers}{protobuf} de Google. La solution exploite des sockets (le script Python est le serveur et le script java est le client) sur le port 9987.
+Nous avons donc choisi de nous orienter vers l'outil \href{https://developers.google.com/protocol-buffers}{protobuf} de Google. La solution exploite des sockets (le script Python est le serveur et le script Java est le client) sur le port 9987.
 \subsection{Implémentation et classes}
 \subsubsection{Protobuf}
 La structure de l'API protobuf est la suivante :
-\begin{center}
-	\begin{tabular}{c}
-		\begin{lstlisting}
+\begin{verbatim}
 option java_package = "org.lara.rnn";
 
 message Command {
@@ -459,9 +482,7 @@ message Command {
   required string name = 2;
   required string data = 3;
 }
-\end{lstlisting}
-	\end{tabular}
-\end{center}
+\end{verbatim}
 Il y a donc 4 types de messages différents :
 \begin{itemize}
 	\item le type \texttt{SWITCH\_PERSON} qui indique quel modèle du RNN à charger (le numéro de la personne est dans le champ \texttt{data}) ;
@@ -486,8 +507,8 @@ La première moitié du script traite de fonctions importées du RNN, nous n'en 
 \tab Cette fonction initialise dans un premier temps le \texttt{socket} qui écoute sur \texttt{localhost} au port \texttt{PORT}.\\
 \tab Le script exécute une boucle infinie. A chaque itération, elle analyse les données reçues via le socket et tente de les interpréter en tant qu'une \texttt{command} de l'API protobuf. Plusieurs cas de figures se présentent alors :
 \begin{itemize}
-	\item Si la commande est de type \texttt{QUESTION} alors celle-ci est retournée sur \texttt{stdout} puis la réponse du RNN est envoyée à travers le \texttt{socket} et l'utilisateur est averti via \texttt{stdout}. (Cela se fait via la fonction \texttt{answer\_command} qui construit l'objet de type \texttt{command} à partir du résultat de \texttt{answer}. Ce dernier réalise la prédiction à partir du RNN (détails dans la partie RNN) en utilisant les modèles spécifiques à la personne actuelle (cf plus bas)) ;
-	\item Si la commande est de type \texttt{ANSWER} alors le serveur retourne une erreur et s'arrête ;
+	\item Si la commande est de type \texttt{QUESTION} alors celle-ci est retournée sur \texttt{stdout} puis la réponse du RNN est envoyée à travers le \texttt{socket} et l'utilisateur est averti via \texttt{stdout}. (Cela se fait via la fonction \texttt{answer\_command} qui construit l'objet de type \texttt{command} à partir du résultat de \texttt{answer}. Ce dernier réalise la prédiction à partir du RNN (détails dans la partie RNN) en utilisant les modèles spécifiques à la personne actuelle (cf. plus bas)) ;
+	\item Si la commande est de type \texttt{ANSWER} alors le serveur renvoie une erreur et s'arrête ;
 	\item Si la commande est de type \texttt{SWITCH\_PERSON} alors le script change la sauvegarde du modèle utilisé pour la prédiction. Celles-ci sont stockées dans \texttt{models} ;
 	\item Si la commande est de type \texttt{SHUTDOWN}, la boucle principale est quittée (l'utilisateur est averti via \texttt{stdout}) et le serveur s'arrête.
 \end{itemize}
@@ -495,19 +516,19 @@ La première moitié du script traite de fonctions importées du RNN, nous n'en 
 \subsubsection{Compilation}
 Afin de compiler le code protobuf, il est nécessaire de l'installer sur le système d'exploitation. Par exemple, sous Ubuntu
 \begin{center}
-	\texttt{sudo apt install protobuf-compiler}
+	\texttt{\$ sudo snap install protobuf -{}-classic}
 \end{center}
 Il faut ensuite compiler le code protobuf
 \begin{center}
-	\texttt{make}
+	\texttt{\$ make}
 \end{center}
 Puis compiler le code Java avec Maven
 \begin{center}
-	\texttt{mvn package}
+	\texttt{\$ mvn package}
 \end{center}
 Puis installer les dépendances Python
 \begin{center}
-	\texttt{pip install protobuf tensorflow numpy}
+	\texttt{\$ pip install protobuf tensorflow numpy}
 \end{center}
 Une fois toutes ces étapes effectuées, assurez-vous que les sauvegardes du RNN (cf la section RNN) sont enregistrées comme suit :
 \begin{center}
@@ -519,12 +540,12 @@ où \texttt{\#\#} est le numéro de la sauvegarde (commençant à 1).
 \subsubsection{Utilisation}
 Il faut tout d'abord lancer le serveur côté Python dans un premier terminal :
 \begin{center}
-	\texttt{cd python} \\
-	\texttt{python main.py}
+	\texttt{\$ cd python} \\
+	\texttt{\$ python main.py}
 \end{center}
 Puis dans un second terminal, lancer le client Java :
 \begin{center}
-	java -cp target/laraproject-*.jar org.lara.rnn.ServerTest
+	\texttt{\$ java -cp target/laraproject-*.jar org.lara.rnn.ServerTest}
 \end{center}
 Ceci va :
 \begin{itemize}
@@ -558,12 +579,12 @@ Dans le cas où on utilise des données autre que celles du NLP, le script réal
 	      \end{itemize}
 	\item la fonction \texttt{clean\_text(text)} est très similaire à celle de \texttt{org.lara.nlp.context.Processer} et est appliquée sur l'intégralité de \texttt{questions} et de \texttt{answers} via l'appel à \texttt{clean\_everything()}.
 \end{itemize}
-Dans le cas contraire, il suffit d'appeler \texttt{use\_custom\_data(path)} où \texttt{path} est le chemin du fichier exporté par le NLP.
+Dans le cas contraire, il suffit d'appeler \texttt{use\_custom\_data(path, size)} où \texttt{path} est le chemin du fichier exporté par le NLP et \texttt{size} est le pourcentage de données utilisé.
 
 \subsubsection{Word Embedding}
 Le word embedding exploite les exportations des modèles issus de \texttt{org.lara.nlp} et plus précisément des méthodes \texttt{write\_vectors(String path)} (converties via le script \texttt{gensim\_convert.txt /chemin/vers/le/modèle.txt}).
 \begin{itemize}
-	\item \texttt{load\_word2vec(model\_path)} charge le modèle exporté par \texttt{org.lara.nlp} (cf explication ci-dessus) au format \texttt{gensim} (et plus précisément le format \texttt{KeyedVectors}) ;
+	\item \texttt{load\_word2vec(model\_path, useFastText)} charge le modèle exporté par \texttt{org.lara.nlp} (cf explication ci-dessus) au format \texttt{gensim} (et plus précisément le format \texttt{KeyedVectors}). En utilisant \texttt{useFastText=True}, il est possible de charger directement une exportation du modèle \texttt{FastText} de \texttt{gensim} en précisant le préfixe de la sauvegarde (cette approche, plus lente, est beaucoup plus performante) ;
 	\item les fonction \texttt{get\_known\_words()} et \texttt{fit\_new\_tokenizer()} vont créer un nouvel objet \texttt{tf.keras.preprocessing.\\text.Tokenizer} où le vocabulaire est issu de l'intersection entre le vocabulaire présent dans le dataset et celui du modèle Word2Vec (ceci diminue énormément la dimensionnalité) ;
 	\item \texttt{create\_embedding\_matrix()} assemble la matrice d'intégration (embedding matrix) à partir du nouveau \texttt{tokenizer}. Cette matrice qui a autant de lignes que de mots dans \texttt{tokenizer} associe à chaque mot un vecteur. C'est une restriction de la matrice du modèle Word2Vec.
 \end{itemize}
@@ -633,13 +654,14 @@ Afin d'installer les dépendances Python, il est nécessaire d’exécuter cette
 	\texttt{pip install numpy tensorflow pyyaml requests gensim argparse}
 \end{center}
 \subsubsection{Utilisation}
-Le script Python s'utilise via un système d'arguments qui peuvent être obtenus à partir de \texttt{python script.py -h} :
+Le script Python s'utilise via un système d'arguments qui peuvent être obtenus à partir de \texttt{\$ python script.py -h} :
 \begin{verbatim}
-usage: script.py [-h] [--downloadData [True/False]] [--customData path]
-                 [--speak [True/False]] [--saveModel path] [--loadModel path]
-                 [--useSpatialDropout [True/False]]
+usage: script.py [-h] --useFastText [True/False] [--downloadData [True/False]]
+                 [--customData path] [--speak [True/False]] [--saveModel path]
+                 [--loadModel path] [--useSpatialDropout [True/False]]
                  [--useReccurentDropout [True/False]]
                  [--useBatchNormalisation [True/False]] [--vectorSize size]
+                 [--dataSize size]
                  word2vec_model
 
 Seq2Seq Neural Network
@@ -649,6 +671,8 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+  --useFastText [True/False]
+                        Specify whether to use Facebook FastText model
   --downloadData [True/False]
                         Specify whether the dataset should be downloaded
   --customData path     Specify the path to the custom dataset
@@ -663,6 +687,7 @@ optional arguments:
   --useBatchNormalisation [True/False]
                         Specify whether to use batch normalisation
   --vectorSize size     Specify the size of the word vectors
+  --dataSize size       Specify the percentage of data to use
 \end{verbatim}
 
 \section{Interface graphique - GUI}
@@ -703,15 +728,15 @@ Ce fichier CSS permet la mise en page des vues, et d'ainsi obtenir un résultat 
 Pour les utilisateurs d'\textit{Oracle Java 8} ou d'une version plus récente, le JDK JavaFX est déjà compris dans le JRE, et il faudra alors simplement compiler les classes \texttt{Main}, \texttt{HomepageCtrl}, et \texttt{ChatFrameCtrl} à l'aide des instructions :
 
 \begin{center}
-	\texttt{javac org.lara.gui.Main.java} \\
-	\texttt{javac org.lara.gui.HomepageCtrl.java}\\
-	\texttt{javac org.lara.gui.ChatFrameCtrl.java}
+	\texttt{\$ javac org.lara.gui.Main.java} \\
+	\texttt{\$ javac org.lara.gui.HomepageCtrl.java}\\
+	\texttt{\$ javac org.lara.gui.ChatFrameCtrl.java}
 \end{center}
 
 Pour les utilisateurs d'\textit{OpenJDK}, il faudra d'abord installer \textit{OpenJFX} et l'inclure dans le classpath. Un tutoriel détaillé de l'installation est disponilble \href{https://wiki.openjdk.java.net/display/OpenJFX/Building+OpenJFX}{\textit{ici}}. L'instruction
 
 \begin{center}
-	\texttt{sudo apt-get install openjfx}
+	\texttt{\$ sudo apt-get install openjfx}
 \end{center}
 permet d'installer \textit{OpenJFX} sous Ubuntu par exemple. \\
 
@@ -719,9 +744,9 @@ Pour les utilisateurs d'une version antérieure à \textit{Oracle Java 8}, il fa
 
 Ainsi, les utilisateurs d'\textit{OpenJDK} ou d'une version de Java antérieure à \textit{Java 8} compileront avec les instructions suivantes :
 \begin{center}
-	\texttt{javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.Main.java} \\
-	\texttt{javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.HomepageCtrl.java} \\
-	\texttt{javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.ChatFrameCtrl.java}
+	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.Main.java} \\
+	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.HomepageCtrl.java} \\
+	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.ChatFrameCtrl.java}
 \end{center}
 où il conviendra de remplacer \texttt{PATH\_TO\_JAVAFX\_SDK} par le chemin du SDK JavaFX.
 
@@ -729,12 +754,12 @@ où il conviendra de remplacer \texttt{PATH\_TO\_JAVAFX\_SDK} par le chemin du S
 
 Les utilisateurs de \textit{Oracle Java 8} ou d'une version plus récente lanceront le client Java par
 \begin{center}
-	\texttt{java org.lara.gui.Main}
+	\texttt{\$ java org.lara.gui.Main}
 \end{center}
 
 Sinon, il conviendra d'utiliser l'instruction suivante :
 \begin{center}
-	\texttt{java -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar:." org.lara.gui.Main}
+	\texttt{\$ java -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar:." org.lara.gui.Main}
 \end{center}
 
 Il est alors demandé à l'utilisateur de saisir un \texttt{username}, puis de choisir un interlocuteur parmi quatre options. Les messages seront saisis dans le champ adapté, et peuvent être envoyés en appuyant sur le bouton \textit{Send} ou sur la touche \textit{Entrée} du clavier.
@@ -742,12 +767,12 @@ Il est alors demandé à l'utilisateur de saisir un \texttt{username}, puis de c
 \subsubsection{Utilisation avec Maven}
 Il est aussi possible de compiler le module via Maven
 \begin{center}
-	\texttt{cd laraGUI} \\
-	\texttt{mvn compile}
+	\texttt{\$ cd laraGUI} \\
+	\texttt{\$ mvn compile}
 \end{center}
 et de l'exécuter via
 \begin{center}
-	\texttt{mvn javafx:run}
+	\texttt{\$ mvn javafx:run}
 \end{center}
 
 
@@ -759,95 +784,117 @@ Afin de télécharger les conversations Messenger, il faut naviguer jusqu'à la 
 \subsection{Mise en place de l'environnement Python}
 A partir de cette étape, nous imaginerons que nous travaillons dans le dossier \texttt{LARA}. Nous allons mettre en place un environnement virtuel pour nos différents scripts Python :
 \begin{center}
-	\texttt{pip install virtualenv} \\
-	\texttt{virtualenv venv} \\
-	\texttt{source venv/bin/activate}
+	\texttt{\$ pip install virtualenv} \\
+	\texttt{\$ virtualenv venv} \\
+	\texttt{\$ source venv/bin/activate}
 \end{center}
-\subsection{Parsing des données personnelles avec FacebookParser}
-Il faut décompresser l'archive Facebook dans un dossier nommé \texttt{facebook-data}. Ensuite, téléchargez LARA :
+\subsection{Téléchargement de LARA un installation des dépendances}
+Commençons par télécharger LARA :
 \begin{center}
 	\texttt{git clone https://github.com/LaraProject/lara}
 \end{center}
-puis les différentes dépendances Python :
+après \texttt{\$ cd lara}, installer protobuf et maven :
 \begin{center}
-	\texttt{pip install ftfy unidecode matplotlib}
+	\texttt{\$ sudo snap install protobuf -{}-classic} \\
+	\texttt{\$ sudo apt-get install maven}
 \end{center}
-Maintenant, il faut créer les dossiers de sorties et d'entrées des différents scripts :
+compiler le protobuf
 \begin{center}
-	\texttt{mkdir parser\_out} \\
-	\texttt{mkdir nlp\_out}
+    \texttt{\$ make}
 \end{center}
-Puis il faut exécuter le parser Facebook sur chaque conversations :
+installer les dépendances python :
 \begin{center}
-	\texttt{./lara/script\_parsing.sh facebook-data parser\_out "Prénom Nom" lara/parserFB.py}
+	\texttt{\$ pip install -r requirements.txt}
 \end{center}
+compiler le package Java :
+\begin{center}
+	\texttt{\$ mvn package}
+\end{center}
+et enfin \texttt{\$ cd ..}
+
+\subsection{Parsing des données personnelles avec FacebookParser}
+Tout d'abord, il faut décompresser l'archive Facebook dans un dossier nommé \texttt{facebook-data}. Ensuite, il faut créer les dossiers de sorties et d'entrées des différents scripts :
+\begin{center}
+	\texttt{\$ mkdir parser\_out} \\
+	\texttt{\$ mkdir nlp\_out}
+\end{center}
+Puis il faut exécuter le parser Facebook sur chaque conversation :
+\begin{center}
+	\texttt{\$ ./lara/script\_parsing.sh facebook-data parser\_out "Prénom Nom" lara/parserFB.py}
+\end{center}
+où "Prénom Nom" correspond au profil Facebook dont est issu le dump Facebook.
+
 \subsection{Traitement des données personnelles avec le NLP}
-Tout d'abord, il faut installer les différentes dépendances :
+Tout d'abord, il faut traiter toutes les conversations :
 \begin{center}
-	\texttt{cd lara} \\
-	\texttt{sudo apt install protobuf-compiler} \\
-	\texttt{make} \\
-	\texttt{pip install -r requirements.txt} \\
-	\texttt{mvn compile} \\
-	\texttt{cd ..} \\
-\end{center}
-Puis traiter toutes les conversations :
-\begin{center}
-	\texttt{./lara/script\_java\_format.sh parser\_out nlp\_out "Prénom Nom" lara/target/laraproject-*.jar}
+	\texttt{\$ ./lara/script\_java\_format.sh parser\_out nlp\_out "Prénom Nom" lara/target/laraproject-*.jar}
 \end{center}
 Vous pouvez ensuite tout regrouper dans un même fichier :
 \begin{center}
-	\texttt{cat nlp\_out/* > data\_facebook\_cleaned.txt}
+	\texttt{\$ cat nlp\_out/* > data\_facebook\_cleaned.txt}
 \end{center}
+
 \subsection{Traitement des données LELU avec le NLP}
-Cette section est très très longue. Il est possible de télécharger le fichier \href{https://drive.google.com/file/d/1suiEo0mGBEszMhmesoj-82Nywy2R7guF/view?usp=sharing}{data\_lelu\_cleaned.txt} directement. Dans le cas contraire, voici les différentes étapes. Il faut tout d'abord télécharger \href{https://www.kaggle.com/breandan/french-reddit-discussion}{ici} le fichier \texttt{final\_SPF\_2.xml}. Puis télécharger le parser :
+Cette section est très très longue. Il est possible de télécharger le fichier \href{https://github.com/LaraProject/notebooks/raw/master/data_lelu_cleaned.txt.lrz}{data\_lelu\_cleaned.txt} (compressé avec lrzip) directement. Dans le cas contraire, voici les différentes étapes. Il faut tout d'abord télécharger \href{https://www.kaggle.com/breandan/french-reddit-discussion}{ici} le fichier \texttt{final\_SPF\_2.xml}. Puis télécharger le parser :
 \begin{center}
-	\texttt{git clone https://github.com/LaraProject/parserLELU} \\
-	\texttt{mv final\_SPF\_2.xml parserLELU/}
+	\texttt{\$ git clone https://github.com/LaraProject/parserLELU} \\
+	\texttt{\$ mv final\_SPF\_2.xml parserLELU/}
 \end{center}
 puis exécuter le script Python :
 \begin{center}
-	\texttt{pip install lxml} \\
-	\texttt{python parserLELU/parserLELU.py > data\_lelu\_raw.txt}
+	\texttt{\$ pip install lxml} \\
+	\texttt{\$ python parserLELU/parserLELU.py > data\_lelu\_raw.txt}
 \end{center}
 puis de le nettoyer à l'aide du NLP (étape la plus longue) :
 \begin{center}
-	\texttt{java -cp lara/target/laraproject-*.jar org.lara.nlp.context.SimpleTest data\_lelu\_raw.txt 0 999999 data\_lelu\_cleaned.txt}
+	\texttt{\$ java -cp lara/target/laraproject-*.jar org.lara.nlp.context.SimpleTest data\_lelu\_raw.txt 0 999999 data\_lelu\_cleaned.txt}
 \end{center}
+
 \subsection{Entraînement du modèle Word2Vec}
-Comme détaillé plus tôt, cette étape peut être réalisée de plusieurs manières différentes : avec Python ou avec Java. Il faut dans tous les cas commencer par combiner les données Facebook et LELU :
+Comme détaillé plus tôt, cette étape peut être réalisée de plusieurs manières différentes : avec Python ou avec Java. Il faut dans tous les cas (sauf si vous utilisez Colab) commencer par combiner les données Facebook et LELU :
 \begin{center}
-	\texttt{cat data\_lelu\_cleaned.txt data\_facebook\_cleaned.txt > data.txt}
+	\texttt{\$ cat data\_lelu\_cleaned.txt data\_facebook\_cleaned.txt > data.txt}
 \end{center}
+
 \subsubsection{Avec Java}
 On utilise la classe \texttt{W2vSimpleTest} comme suit :
 \begin{center}
-	\texttt{java -cp lara/target/laraproject-*.jar org.lara.nlp.word2vec.W2vSimpleTest data.txt 0 999999 word2vec\_vectors.txt}
+	\texttt{\$ java -cp lara/target/laraproject-*.jar org.lara.nlp.word2vec.W2vSimpleTest data.txt 0 999999 word2vec\_vectors.txt}
 \end{center}
 puis la convertir dans le bon format :
 \begin{center}
-	\texttt{./lara/gensim\_convert.sh word2vec\_vectors.txt}
+	\texttt{\$ ./lara/gensim\_convert.sh word2vec\_vectors.txt}
 \end{center}
+
 \subsubsection{Avec Python}
 On utilise le script \texttt{fasttext.py} :
 \begin{center}
-	\texttt{pip install gensim argparse} \\
-	\texttt{python lara/fasttext.py -{}-path word2vec\_vectors.txt data.txt}
+	\texttt{\$ python lara/fasttext.py -{}-path word2vec\_vectors.txt data.txt}
 \end{center}
+Il est possible (\textbf{recommandé}) d'exporter l’intégralité du modèle \texttt{FastText} de \texttt{gensim} avec l'argument \texttt{-{}-modelPath path} où \texttt{path} est le préfixe (avec le chemin) des fichiers d'exportation.
+
 \subsubsection{Avec Python via Google Collab}
-Il suffit d'importer \href{https://github.com/LaraProject/notebooks/blob/master/LaraProject_Word2Vec.ipynb}{ce notebook} qui contient toutes les instructions.
+Il suffit d'importer \href{https://github.com/LaraProject/notebooks/blob/master/LaraProject_Word2Vec.ipynb}{ce notebook} qui contient toutes les instructions. \textbf{Inutile de télécharger \texttt{data\_lelu\_cleaned.txt} le notebook s'en charge lui même}.
+
 \subsection{Entraînement du RNN}
 \subsubsection{Sur son ordinateur personnel}
-Tout d'abord, installons les dépendances :
-\begin{center}
-	\texttt{pip install tensorflow pyyaml requests gensim argparse}
-\end{center}
-Il n'y a plus qu'a le lancer
-\begin{center}
-	\texttt{mkdir model\_save} \\
-	\texttt{python lara/seq2seq.py -{}-customData data\_facebook\_cleaned.txt -{}-saveModel model\_save  word2vec\_vectors.txt}
-\end{center}
-Cette commande va entraîner le RNN et sauvegarder le modèle dans le dossier \texttt{model\_save}.
+Il faut tout d'abord créer le dossier d'exportation \texttt{\$ mkdir model\_save}. Ensuite, il y a plusieurs approches disponibles pour le chargement du modèle Word2Vec :
+\begin{itemize}
+    \item Si vous avez le fichier \texttt{word2vec\_vectors.txt} vous pouvez utiliser l'approche 1, c'est à dire :
+    \begin{center}
+    	\texttt{\$ python lara/seq2seq.py -{}-customData data\_facebook\_cleaned.txt -{}-saveModel model\_save  word2vec\_vectors.txt -{}-useFastText False}
+    \end{center}
+    où \texttt{word2vec\_vectors.txt} est le chemin du fichier exporté par le NLP ;
+    \item Si vous avez les 7 fichiers de la forme \texttt{word2vec\_model.bin*} vous pouvez utiliser l'approche 2
+    \begin{center}
+    	\texttt{\$ python lara/seq2seq.py -{}-customData data\_facebook\_cleaned.txt -{}-saveModel model\_save  word2vec\_model.bin -{}-useFastText True}
+    \end{center}
+    où \texttt{word2vec\_model.bin} est le préfixe (comprenant le chemin) des 7 fichiers correspondant au modèle FastText exporté.
+\end{itemize}
+Il faut choisir entre l'approche 1 et l'approche 2. L'approche 2 est significativement plus performante mais plus lente (\~5h30 d'entraînement). Cette commande va entraîner le RNN et sauvegarder le modèle dans le dossier \texttt{model\_save}. En cas de problème de taille de tensor, il est possible de diminuer la taille du dataset utilisée en spécifiant un pourcentage via \texttt{-{}-dataSize}.
+
 \subsubsection{Via Google Collab}
 Il suffit d'importer \href{https://github.com/LaraProject/notebooks/blob/master/LaraProject_RNN.ipynb}{ce notebook} qui contient toutes les instructions.
+
+
 \end{document}
