@@ -182,36 +182,21 @@ Il suffit d'ouvrir un terminal et de lancer la commande :
 Cette commande peut-être enrichie en donnant des arguments supplémentaires optionnels :
 
 \begin{center}
-	\texttt{\$ python3 parserFB.py inputFile outputFile answerer --nbMessages [int] --debug [True/False] --withTimestamp [True/False] --delayBetween2Conv [int]}
+	\texttt{\$ python3 parserFB.py inputFile outputFile answerer --nbMessages [int] -{}-debug [True/False] -{}-withTimestamp [True/False] --delayBetween2Conv [int]}
 \end{center}
 
-Voici ce que renvoie la commande \texttt{\$ python3 parserFB -h} :
+\texttt{parserFB.py} prend de multiples paramètres :
+\begin{itemize}
+ \item \texttt{inputFile} : dossier de donéées de FaceBook (le dossier \texttt{messages} habituellement).
+ \item \texttt{outputFile} : dossier de sortie du parser. Doit être préalablement créé.
+ \item \texttt{answerer} : filtre les messages autour du compte spécifié. Par exemple, ``Jean Dupont''. Ainsi, le dataset pourra être utilisé pour faire un chatbot ayant le même style de message que cette personne.
+ \item \texttt{-{}-nbMessages} : utilisé pour spécifier une limite max dans le nombre de messages parsés. Utile lorsque le nombre de messages est énorme, ou pour faire un test sur un très petit dataset.
+ \item \texttt{-{}-debug} : sert à afficher diverses informations de débogage.
+ \item \texttt{-{}-withTimestamp} : sauvegarder l'heure d'envoi du message dans la sortie parsée.
+ \item \texttt{-{}-delayBetween2Conv} : seuil à partir de laquelle deux messages sont considérés comme faisant partie de conversations distinctes.
+ \item \texttt{-{}-export } : exporte le résultat du parsing dans un seul gros fichier .json
+\end{itemize}
 
-\begin{verbatim}
-usage: parserFB.py [-h] [--nbMessages [integer]] [--debug [True/False]]
-                   [--withTimestamp [True/False]]
-                   [--delayBetween2Conv [time_in_seconds]]
-                   [--export file_export]
-                   file answerer
-
-Faceboot data parser
-
-positional arguments:
-  file                  Path to file containing facebook data
-  answerer              Who will answer your questions
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --nbMessages [integer]
-                        Default: 100
-  --debug [True/False]  Default: False
-  --withTimestamp [True/False]
-                        Default: False
-  --delayBetween2Conv [time_in_seconds]
-                        Default: 20min
-  --export file_export  Default: None
-
-\end{verbatim}
 \subsubsection{Les scripts BASH}
 Le script \texttt{script\_parsing.sh} permet d'utiliser le parser sur toutes les conversations d'un dump Facebook. Son utilisation est la suivante :
 \begin{center}
@@ -381,28 +366,18 @@ Il est aussi possible de restaurer un modèle sauvegardé (via la fonction \text
 	\texttt{KeyedVectors.load\_word2vec\_format(fichier.txt, binary=False)}
 \end{center}
 \subsubsection{Le script \texttt{fasttxt.py}}
-La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant être très longue, nous proposons une alternative via python et le module \texttt{gensim} (évoqué précédemment). Elle implémente l'architecture \href{https://fasttext.cc/}{FastText} de Facebook à partir d'un fichier compréhensible par la classe \texttt{Simple}. Avant de poursuivre, il est nécessaire d'installer le module \texttt{gension} via \texttt{pip} (cf la section sur le RNN). Son utilisation est précisée par \texttt{python fasttext.py -h} :
-\begin{verbatim}
-usage: fasttext.py [-h] [--size size] [--window size] [--minCount count]
-                   [--workers num] [--epochs size] [--path path]
-                   [--modelPath path]
-                   facebook_data
+La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant être très longue, nous proposons une alternative via python et le module \texttt{gensim} (évoqué précédemment). Elle implémente l'architecture \href{https://fasttext.cc/}{FastText} de Facebook à partir d'un fichier compréhensible par la classe \texttt{Simple}. Avant de poursuivre, il est nécessaire d'installer le module \texttt{gensim} via \texttt{pip} (cf la section sur le RNN). Son utilisation est précisée par \texttt{python fasttext.py -h}.
 
-FastText Word Vectors
+\begin{itemize}
+ \item \texttt{-{}-size} : définit la taille des vecteurs de mot (un plus grand vecteur permettra peut être plus de précision dans les prédictions, mais sera plus long à entraîner, et nécessitera plus de données pour un résultat satisfaisant).
+ \item \texttt{-{}-window} : taille de la fenêtre de messages utilisés pour donner du contexte à un message.
+ \item \texttt{-{}-minCount} : nombres d'occurences minimales d'un mot pour qu'il soit pris en compte dans le Word2Vec.
+ \item \texttt{-{}-workers} : nombre de fils d'exécution utilisés lors de l'apprentissage du Word2Vec
+ \item \texttt{-{}-epochs} : nombre d'époques d'entraînement, c'est-à-dire combien de fois l'apprentissage est affiné sur le set de données. Un nombre plus élevé nécessite plus de temps, mais peut apporter une meilleure précision du Word2Vec
+ \item \texttt{-{}-path} : dossier d'export des vecteurs de mots.
+ \item \texttt{-{}-modelPath} : dossier d'export du modèle FastText complet.
+\end{itemize}
 
-positional arguments:
-  facebook_data     Path to the data
-
-optional arguments:
-  -h, --help        show this help message and exit
-  --size size       Specify the size of the word vectors
-  --window size     Specify the size of the window
-  --minCount count  Specify the minimum amount of occurence of a word
-  --workers num     Specify the number of threads dedicated to the training
-  --epochs size     Specify the number of epochs for the algorithm
-  --path path       Specify the export path of the word vectors
-  --modelPath path  Specify the export path of the FastText model
-\end{verbatim}
 \subsection{Compilation, tests et utilisation}
 Le module se compile grâce au gestionnaire de dépendance \href{https://maven.apache.org/}{Maven}. Il suffit d'une seule commande :
 \begin{center}
@@ -667,40 +642,31 @@ Afin d'installer les dépendances Python, il est nécessaire d’exécuter cette
 	\texttt{pip install numpy tensorflow pyyaml requests gensim argparse}
 \end{center}
 \subsubsection{Utilisation}
-Le script Python s'utilise via un système d'arguments qui peuvent être obtenus à partir de \texttt{\$ python script.py -h} :
+Le script Python s'utilise via un système d'arguments qui peuvent être obtenus à partir de \texttt{\$ python seq2seq.py -h}.
+
+Ses options sont les suivantes :
+\begin{itemize}
+ \item \texttt{-{}-useFastText [True/False]} : est-ce que l'on utilise le Word2Vec de Facebook, FastText.
+ \item \texttt{-{}-downloadData [True/False]} : est-ce que le set de données doit être téléchargé.
+ \item \texttt{-{}-speak [True/False]} : active un mode interractif de test après que l'entraînement soit terminé.
+ \item \texttt{-{}-saveModel path} : dossier dans lequel soauvegarder le modèle.
+ \item \texttt{-{}-loadModel path} : dossier depuis lequel charger un modèle déjà entraîné.
+ \item \texttt{-{}-useSpatialDropout [True/False]} : utiliser ou non des couches de Dropout après les les couches d'embedding. Peut aider à réduire le surentraînement.
+ \item \texttt{-{}-useReccurentDropout [True/False]} : utiliser un dropout dans le LSTM. Effets variables, mais temps d'entraînement augmenté.
+ \item \texttt{-{}-useBatchNormalisation [True/False]} : utiliser des couches de Batch Normalisation. Peut aider à une meilleure généralisation du modèle, mais augmente la durée d'entraînement légèrement.
+ \item \texttt{-{}-vectorSize [True/False]} : taille des vecteurs de mot. Doit être consistant avec la taille des mots du Word2Vec.
+ \item \texttt{-{}-dataSize [True/False]} : fraction (en pourcentage) des données du dataset à utiliser pour l'entraînement. Par défaut, on utilise tout. Mettre une valeur différente de 100 est utile pour des tests rapides.
+ \item \texttt{word2vec\_model} : Paramètre \textbf{obligatoire}. Le Word2Vec utilisé pour l'entraînement.
+\end{itemize}
+
 \begin{verbatim}
-usage: script.py [-h] --useFastText [True/False] [--downloadData [True/False]]
+usage: seq2seq.py [-h] --useFastText [True/False] [--downloadData [True/False]]
                  [--customData path] [--speak [True/False]] [--saveModel path]
                  [--loadModel path] [--useSpatialDropout [True/False]]
                  [--useReccurentDropout [True/False]]
                  [--useBatchNormalisation [True/False]] [--vectorSize size]
                  [--dataSize size]
                  word2vec_model
-
-Seq2Seq Neural Network
-
-positional arguments:
-  word2vec_model        Path to the word2vec model
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --useFastText [True/False]
-                        Specify whether to use Facebook FastText model
-  --downloadData [True/False]
-                        Specify whether the dataset should be downloaded
-  --customData path     Specify the path to the custom dataset
-  --speak [True/False]  Specify whether to speak with the Network
-  --saveModel path      Specify the path where to save the model
-  --loadModel path      Specify the path to import the model
-  --useSpatialDropout [True/False]
-                        Specify whether to use 1D spatial dropout after the
-                        embedding layers
-  --useReccurentDropout [True/False]
-                        Specify whether to use a recurrent dropout in the LSTM
-  --useBatchNormalisation [True/False]
-                        Specify whether to use batch normalisation
-  --vectorSize size     Specify the size of the word vectors
-  --dataSize size       Specify the percentage of data to use
 \end{verbatim}
 
 \section{Interface graphique - GUI}
