@@ -23,7 +23,7 @@
 \newpage
 
 \section{Introduction}
-L.A.R.A est un logiciel complet mettant en œuvre un agent conversationnel entraîné sur des discussions issues de Facebook. Ce logiciel repose notamment sur les bibliothèques \href{https://deeplearning4j.org/}{Deeplearning4J} et \href{https://openjfx.io/}{JavaFX} pour Java ainsi que sur les bibliothèques \href{https://www.tensorflow.org/}{Tensorflow} et \href{https://keras.io/}{Keras} pour python. Toutes ces bibliothèques sont utilisées dans leurs plus récentes versions au mois de Juin 2020. L'intégralité du code est opensource et peut être consulté sur \href{https://github.com/LaraProject}{le github LaraProject}. \\
+L.A.R.A est un logiciel complet mettant en œuvre un agent conversationnel entraîné sur des discussions issues de Facebook. Ce logiciel repose notamment sur les bibliothèques \href{https://deeplearning4j.org/}{Deeplearning4J} et \href{https://openjfx.io/}{JavaFX} pour Java ainsi que sur les bibliothèques \href{https://www.tensorflow.org/}{Tensorflow} et \href{https://keras.io/}{Keras} pour python. Toutes ces bibliothèques sont utilisées dans leurs plus récentes versions au mois de Juin 2020. L'intégralité du code est opensource et peut être consultée sur \href{https://github.com/LaraProject}{le github LaraProject}. \\
 \tab L.A.R.A est découpé en plusieurs modules :
 \begin{itemize}
 \item Facebook Parser
@@ -171,7 +171,10 @@ Voici les paramètres : \texttt{finalDump(self, filename)}. Cette méthode crée
 
 \subsection{Utilisation}
 \subsubsection{Le parser}
-Le parser a été conçu pour être utilisable le plus simplement possible. Pour cela une utilisation par ligne de commande a été implantée grâce à la librairie \texttt{argparse}.
+Le parser a été conçu pour être utilisable le plus simplement possible. Pour cela une utilisation par ligne de commande a été implantée grâce à la librairie \texttt{argparse}. Après avoir installer les dépendances via
+\begin{center}
+	\texttt{\$ pip install -r requirements.txt}
+\end{center}
 
 Il suffit d'ouvrir un terminal et de lancer la commande :
 
@@ -366,7 +369,7 @@ Il est aussi possible de restaurer un modèle sauvegardé (via la fonction \text
 	\texttt{KeyedVectors.load\_word2vec\_format(fichier.txt, binary=False)}
 \end{center}
 \subsubsection{Le script \texttt{fasttxt.py}}
-La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant être très longue, nous proposons une alternative via python et le module \texttt{gensim} (évoqué précédemment). Elle implémente l'architecture \href{https://fasttext.cc/}{FastText} de Facebook à partir d'un fichier compréhensible par la classe \texttt{Simple}. Avant de poursuivre, il est nécessaire d'installer le module \texttt{gensim} via \texttt{pip} (cf la section sur le RNN). Son utilisation est précisée par \texttt{python fasttext.py -h}.
+La réalisation du modèle Word2Vec avec l'approche de Deeplearning4J pouvant être très longue, nous proposons une alternative via python et le module \texttt{gensim} (évoqué précédemment). Elle implémente l'architecture \href{https://fasttext.cc/}{FastText} de Facebook à partir d'un fichier compréhensible par la classe \texttt{Simple}. Avant de poursuivre, il est nécessaire d'installer le module \texttt{gensim} via \texttt{\$ pip install -r requirements.txt} (cf la section sur le RNN). Son utilisation est précisée par \texttt{\$ python fasttext.py -h}.
 
 \begin{itemize}
  \item \texttt{-{}-size} : définit la taille des vecteurs de mot (un plus grand vecteur permettra peut être plus de précision dans les prédictions, mais sera plus long à entraîner, et nécessitera plus de données pour un résultat satisfaisant).
@@ -515,7 +518,7 @@ Puis compiler le code Java avec Maven
 \end{center}
 Puis installer les dépendances Python
 \begin{center}
-	\texttt{\$ pip install protobuf tensorflow numpy}
+	\texttt{\$ pip install -r requirements.txt}
 \end{center}
 Une fois toutes ces étapes effectuées, assurez-vous que les sauvegardes du RNN (cf la section RNN) sont enregistrées comme suit :
 \begin{center}
@@ -639,7 +642,7 @@ Les différents objets clefs de cette implémentation peuvent être exportés (e
 
 Afin d'installer les dépendances Python, il est nécessaire d’exécuter cette commande :
 \begin{center}
-	\texttt{pip install numpy tensorflow pyyaml requests gensim argparse}
+	\texttt{\$ pip install -r requirements.txt}
 \end{center}
 \subsubsection{Utilisation}
 Le script Python s'utilise via un système d'arguments qui peuvent être obtenus à partir de \texttt{\$ python seq2seq.py -h}.
