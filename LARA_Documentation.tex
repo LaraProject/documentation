@@ -547,7 +547,7 @@ Ceci va :
 Vous pouvez visualiser les différentes interactions dans la sortie des deux terminaux.
 
 \section{Réseau de neurones récursif - RNN}
-Le réseau de neurones utilisé ici est une copie quasi-conforme du script fourni par Swapnil Ashok Jadhav dans son article "Marathi To English Neural Machine Translation With Near Perfect Corpus And Transformers" publié dans son \href{https://colab.research.google.com/drive/11os3isH4I4X76dwOAQJ5cSRnfhmUziHm#scrollTo=dHBP5xzmrM4U}{Google Collab}. Seules des modifications mineures ont été réalisées.
+Le réseau de neurones utilisé ici est basé sur le script fourni par Swapnil Ashok Jadhav dans son article "Marathi To English Neural Machine Translation With Near Perfect Corpus And Transformers" publié dans son \href{https://colab.research.google.com/drive/11os3isH4I4X76dwOAQJ5cSRnfhmUziHm#scrollTo=dHBP5xzmrM4U}{Google Collab}. Des modifications majeures ont été effectuées à la fois sur le modèle et sur ses hyper-paramètres. 
 \subsection{Objectifs et outils}
 L'objectif est de mettre en œuvre en Python un modèle de \href{https://arxiv.org/abs/1409.3215}{Seq2Seq}. Les contraintes sont les suivantes :
 \begin{itemize}
@@ -612,7 +612,7 @@ Le schéma récapitulatif du modèle a été exporté via \texttt{tf.keras.utils
 	\includegraphics[scale=0.5]{model.png}
 	\caption{Modèle du RNN}
 \end{figure}
-L'entraînement peut être réalisé avec la fonction \texttt{train(use\_spatial\_dropout, use\_reccurent\_dropout, use\_batch\_normalisation)} avec l'optimiseur \texttt{ADAM} et la fonction de coût \texttt{sparse\_categorical\_crossentropy}.
+L'entraînement peut être réalisé avec la fonction \texttt{train(use\_spatial\_dropout, use\_reccurent\_dropout, use\_batch\_normalisation)} avec l'optimiseur \texttt{NADAM} et la fonction de coût \texttt{sparse\_categorical\_crossentropy}.
 \subsubsection{Disposition inférentielle}
 Le modèle inférentiel est légèrement complexe. Il est composé de deux modèles : le modèle inférentiel de l'encodeur \texttt{encoder\_model} et le modèle inférentiel du décodeur \texttt{decoder\_model}.
 \begin{itemize}
