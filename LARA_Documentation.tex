@@ -10,6 +10,7 @@
 \usepackage{hyperref}
 \usepackage{listings}
 
+
 \title{L.A.R.A Documentation}
 \author{Rédigé par : Louis Grenioux, Anna-Rose Lescure, Riad El Otmani}
 
@@ -19,11 +20,10 @@
 
 \maketitle
 \tableofcontents
-
 \newpage
 
 \section{Introduction}
-L.A.R.A est un logiciel complet mettant en œuvre un agent conversationnel entraîné sur des discussions issues de Facebook. Ce logiciel repose notamment sur les bibliothèques \href{https://deeplearning4j.org/}{Deeplearning4J} et \href{https://openjfx.io/}{JavaFX} pour Java ainsi que sur les bibliothèques \href{https://www.tensorflow.org/}{Tensorflow} et \href{https://keras.io/}{Keras} pour python. Toutes ces bibliothèques sont utilisées dans leurs plus récentes versions au mois de Juin 2020. L'intégralité du code est opensource et peut être consulté sur \href{https://github.com/LaraProject}{le github LaraProject}. \\
+L.A.R.A est un logiciel complet mettant en œuvre un agent conversationnel entraîné sur des discussions issues de Facebook. Ce logiciel repose notamment sur les bibliothèques \href{https://deeplearning4j.org/}{Deeplearning4J} et \href{https://openjfx.io/}{JavaFX} pour Java ainsi que sur les bibliothèques \href{https://www.tensorflow.org/}{Tensorflow} et \href{https://keras.io/}{Keras} pour Python. Toutes ces bibliothèques sont utilisées dans leurs plus récentes versions au mois de juin 2020. L'intégralité du code est opensource et peut être consultée sur \href{https://github.com/LaraProject}{le github LaraProject}. \\
 \tab L.A.R.A est découpé en plusieurs modules :
 \begin{itemize}
 \item Facebook Parser
@@ -41,7 +41,7 @@ Nous avons décidé de travailler tout au long de ce projet en ayant comme objec
 Son rôle est d'ordonner et organiser le dump de données que nous pouvons télécharger sur Facebook de manière à en faire un dataset d'entraînement et de validation valide pour les prochains modules qui composent le projet LARA.
 
 \subsection{Traitement des données}
-Le parser opère sur le dump FaceBook un ensemble d'opérations dont il est possible de voir le résultat dans cette partie.
+Le parser opère sur le dump Facebook un ensemble d'opérations dont il est possible de voir le résultat dans cette partie.
 
 \subsubsection{Données initiales}
 Données extraites du fichier \texttt{dumpFacebook.json}.
@@ -190,7 +190,7 @@ Cette commande peut-être enrichie en donnant des arguments supplémentaires opt
 
 \texttt{parserFB.py} prend de multiples paramètres :
 \begin{itemize}
- \item \texttt{inputFile} : dossier de donéées de FaceBook (le dossier \texttt{messages} habituellement).
+ \item \texttt{inputFile} : dossier de donéées de Facebook (le dossier \texttt{messages} habituellement).
  \item \texttt{outputFile} : dossier de sortie du parser. Doit être préalablement créé.
  \item \texttt{answerer} : filtre les messages autour du compte spécifié. Par exemple, ``Jean Dupont''. Ainsi, le dataset pourra être utilisé pour faire un chatbot ayant le même style de message que cette personne.
  \item \texttt{-{}-nbMessages} : utilisé pour spécifier une limite max dans le nombre de messages parsés. Utile lorsque le nombre de messages est énorme, ou pour faire un test sur un très petit dataset.
@@ -651,8 +651,8 @@ Ses options sont les suivantes :
 \begin{itemize}
  \item \texttt{-{}-useFastText [True/False]} : est-ce que l'on utilise le Word2Vec de Facebook, FastText.
  \item \texttt{-{}-downloadData [True/False]} : est-ce que le set de données doit être téléchargé.
- \item \texttt{-{}-speak [True/False]} : active un mode interractif de test après que l'entraînement soit terminé.
- \item \texttt{-{}-saveModel path} : dossier dans lequel soauvegarder le modèle.
+ \item \texttt{-{}-speak [True/False]} : active un mode interractif de test après que l'entraînement est terminé.
+ \item \texttt{-{}-saveModel path} : dossier dans lequel sauvegarder le modèle.
  \item \texttt{-{}-loadModel path} : dossier depuis lequel charger un modèle déjà entraîné.
  \item \texttt{-{}-useSpatialDropout [True/False]} : utiliser ou non des couches de Dropout après les les couches d'embedding. Peut aider à réduire le surentraînement.
  \item \texttt{-{}-useReccurentDropout [True/False]} : utiliser un dropout dans le LSTM. Effets variables, mais temps d'entraînement augmenté.
@@ -675,16 +675,17 @@ usage: seq2seq.py [-h] --useFastText [True/False] [--downloadData [True/False]]
 \section{Interface graphique - GUI}
 \subsection{Objectifs et outils}
 
-L'objectif de l'interface graphique (\textit{Graphical User Interface}) est de recréer l'interface d'un système de communication tel que \textit{Messenger} ou \textit{WhatsApp} par exemple. Ce package (\texttt{org.lara.gui}), dont le code source individuel peut être retrouvé \href{https://github.com/LaraProject/GUI}{\textit{ici}}, est écrit à l'aide de la bibliothèque \texttt{JavaFX} et a été conçu en partie avec le logiciel \textit{Scene Builder}. Il a pour mission d'être simple d'utilisation, et de permettre à l'utilisateur d'échanger avec une personne de son choix, ainsi que de changer d'interlocuteur et de choisir un surnom. La mise en page a été réalisée à l'aide de CSS.
+L'objectif de l'interface graphique (\textit{Graphical User Interface}) est de recréer l'interface d'un système de communication tel que \textit{Messenger} ou \textit{WhatsApp} par exemple. Ce package (\texttt{org.lara.gui}), dont le code source individuel peut être retrouvé \href{https://github.com/LaraProject/GUI}{\textit{ici}}, est écrit à l'aide de la bibliothèque \texttt{JavaFX} et a été conçu en partie avec le logiciel \textit{Scene Builder}. Il a pour mission d'être simple d'utilisation, et de permettre à l'utilisateur d'échanger avec une personne de son choix, ainsi que de changer d'interlocuteur et de choisir un surnom. 
+%La mise en page a été réalisée à l'aide de CSS.
 
 \subsection{Implémentation et classes}
 \subsubsection{La classe \texttt{Main}}
 
-La classe \texttt{Main} permet de lancer l'interface graphique. Y sont définis les chemins des vues \texttt{Homepage.fxml} et \texttt{ChatFrame.fxml}. La classe \texttt{Main} est consitutée de la méthode usuelle d'un GUI : \texttt{start(Stage primaryStage)}.
+La classe \texttt{Main} permet de lancer l'interface graphique. Y sont définis les chemins des vues \texttt{Homepage.fxml} et \texttt{ChatFrame.fxml}. La classe \texttt{Main} est consitutée de la méthode usuelle d'un GUI, \texttt{start(Stage primaryStage)}, ainsi que d'une méthode \texttt{closeWindowEvent(WindowEvent event)} qui a permet de garantir la fermeture de l'éventuel serveur quel que soit le procédé choisi par l'utilisteur pour quitter LARA.
 
 \subsubsection{La classe \texttt{HomepageCtrl}}
 
-La classe \texttt{HomepageCtrl} constitue le contrôleur de la vue \texttt{Homepage.fxml}, c'est-à-dire de la page d'accueil de l'interface graphique. Elle définit la méthode \texttt{chooseUsername(ActionEvent event)}, qui permet à l'utilisateur de définir un éventuel \textit{username}, et qui permet le changement de vue, au profit de \texttt{ChatFrame.fxml}.
+La classe \texttt{HomepageCtrl} constitue le contrôleur de la vue \texttt{Homepage.fxml}, c'est-à-dire de la page d'accueil de l'interface graphique. Elle définit la méthode \texttt{chooseUsername(ActionEvent event)}, qui permet à l'utilisateur de définir un éventuel \textit{username}, et qui permet le changement de vue, au profit de \texttt{ChatFrame.fxml}. La méthode \texttt{chooseKeyPressed(KeyEvent event)} permet de faire de même en appuyant sur la touche "Entrée" du clavier.
 
 \subsubsection{La classe \texttt{ChatFrameCtrl}}
 
@@ -692,17 +693,24 @@ La classe \texttt{ChatFrameCtrl} constitue le contrôleur de la vue \texttt{Chat
 
 \begin{itemize}
 	\item les méthodes \texttt{idLouis(ActionEvent event)}, \texttt{idAnna(ActionEvent event)}, \texttt{idRiad(ActionEvent event)}, et \texttt{idAntoine(ActionEvent event)} permettent de changer d'interlocuteur et d'effacer la conversation précédente, à partir de la méthode \texttt{idLara()} ;
-	\item la méthode \texttt{exitLara(ActionEvent event)} permet d'éteindre le serveur et de quitter l'interface graphique ;
-	\item il est possible d'envoyer un message en cliquant sur le bouton dédié, ou simplement en appuyant sur la touche \textit{Entrée} du clavier, grâce aux méthodes \texttt{sendMessage(ActionEvent event)} et \texttt{sendKeyPressed(KeyEvent keyEvent)} qui utilisent la méthode \texttt{send()}.
+	\item la méthode \texttt{exitLara(ActionEvent event)} permet d'éteindre le serveur et de quitter l'interface graphique ;
+	\item il est possible d'envoyer un message en cliquant sur le bouton dédié, ou simplement en appuyant sur la touche \textit{Entrée} du clavier, grâce aux méthodes \texttt{sendMessage(ActionEvent event)} et \texttt{sendKeyPressed(KeyEvent keyEvent)} qui utilisent la méthode \texttt{send()} ;
+	\item la méthode \texttt{emojiAction(ActionEvent event)} permet d'afficher ou non un clavier d'emojis utilisables ;
+	\item il est possible d'envoyer des emojis, grâce à la méthode \texttt{initialize()}, qui utilise une expression lamdba pour permettre la saisie d'emojis.
 \end{itemize}
+
+\subsubsection{Les classes \texttt{Bubble}, \texttt{BubbleSpec}, et \texttt{BubbledLabel}}
+
+Ces classes ont été écrites par Terah Laweh, et sont utilisées en accord avec la Licence Apache 2.0. Elles ont pour objectif de permettre, dans un futur proche, une mise en page plus esthétique, plus fidèle aux systèmes de communication que nous avons souhaité imiter. Dans la version actuelle du GUI, elles ne sont pas exploitées.
+
 
 \subsubsection{Les vues}
 
 Les vues \texttt{Homepage.fxml} et \texttt{ChatFrame.fxml} permettent de définir la présentation de l'interface graphique.
 
-\subsubsection{La stylesheet \texttt{application.css}}
+%\subsubsection{La stylesheet \texttt{application.css}}
 
-Ce fichier CSS permet la mise en page des vues, et d'ainsi obtenir un résultat le plus proche possible des interfaces graphiques des systèmes de communication traditionnels.
+%Ce fichier CSS permet la mise en page des vues, et d'ainsi obtenir un résultat le plus proche possible des interfaces graphiques des systèmes de communication traditionnels.
 
 \subsection{Compilation, tests et utilisation}
 
@@ -712,7 +720,10 @@ Pour les utilisateurs d'\textit{Oracle Java 8} ou d'une version plus récente, l
 \begin{center}
 	\texttt{\$ javac org.lara.gui.Main.java} \\
 	\texttt{\$ javac org.lara.gui.HomepageCtrl.java}\\
-	\texttt{\$ javac org.lara.gui.ChatFrameCtrl.java}
+	\texttt{\$ javac org.lara.gui.ChatFrameCtrl.java} \\
+	\texttt{\$ javac org.lara.gui.Bubble.java} \\
+	\texttt{\$ javac org.lara.gui.BubbleSpec.java} \\
+	\texttt{\$ javac org.lara.gui.BubbledLabel.java}
 \end{center}
 
 Pour les utilisateurs d'\textit{OpenJDK}, il faudra d'abord installer \textit{OpenJFX} et l'inclure dans le classpath. Un tutoriel détaillé de l'installation est disponilble \href{https://wiki.openjdk.java.net/display/OpenJFX/Building+OpenJFX}{\textit{ici}}. L'instruction
@@ -728,7 +739,10 @@ Ainsi, les utilisateurs d'\textit{OpenJDK} ou d'une version de Java antérieure 
 \begin{center}
 	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.Main.java} \\
 	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.HomepageCtrl.java} \\
-	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.ChatFrameCtrl.java}
+	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.ChatFrameCtrl.java} \\
+	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.Bubble.java} \\
+	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.BubbleSpec.java} \\
+	\texttt{\$ javac -classpath "PATH\_TO\_JAVAFX\_SDK/rt/lib/jfxrt.jar" org.lara.gui.BubbledLabel.java}
 \end{center}
 où il conviendra de remplacer \texttt{PATH\_TO\_JAVAFX\_SDK} par le chemin du SDK JavaFX.
 
@@ -759,7 +773,7 @@ et de l'exécuter via
 
 
 \section{Utilisation de LARA}
-Cette section détaille comment utiliser le logiciel à partir de 0.
+Cette section détaille comment utiliser le logiciel à partir de 0. Dans le cas où l'on disposerait déjà de RNN pré-entraînés que l'on voudrait utiliser avec LARA, voir la section 7.9.
 \subsection{Téléchargement des données Facebook}
 Afin de télécharger les conversations Messenger, il faut naviguer jusqu'à la page \texttt{Télécharger vos informations} (\texttt{Paramètres} $\longrightarrow$ \texttt{Vos informations Facebook} $\longrightarrow$ \texttt{Télécharger vos informations}). Une fois arrivé, il faut saisir \texttt{Format : JSON} et \texttt{Qualité des photos : faible}. Dans la liste \texttt{Vos données}, il faut uniquement cocher \texttt{Messages}. \\
 \tab Facebook vous enverra une notification une fois votre archive prête (cela peut mettre plusieurs heures) qu'il vous faudra télécharger afin de passer à la suite.
@@ -886,10 +900,10 @@ A partir des fichiers exportés par le RNN, il faut former l’arborescence suiv
 	\texttt{lara/models/\#\#/tokenizer.pickle} \\
 	\texttt{lara/models/\#\#/length.txt}
 \end{center}
-où \texttt{\#\#} correspond au numéro de la personne (c'est numéro commence à $1$, si aucun numéro n'a été explicitement attribué, il faut mettre le numéro existant $+1$).
+où \texttt{\#\#} correspond au numéro de la personne à partir duquel le RNN a été entraîné.
 
 \subsection{Exécution et accès à l'interface graphique}
-Afin d'exécuter LARA, il faut ouvrir deux terminaux distincts. Attention dans chaque terminal veillez à être dans le bon dossier \texttt{\$ LARA/lara} et d'utiliser l'environnement virtuel python \texttt{\$ source ../venv/bin/activate}.
+Afin d'exécuter LARA, il faut ouvrir deux terminaux distincts. Attention, dans chaque terminal veillez à être dans le bon dossier \texttt{\$ LARA/lara} et d'utiliser l'environnement virtuel python \texttt{\$ source ../venv/bin/activate}.
 \subsubsection{Premier terminal : le serveur}
 Pour allumer le serveur, il suffit d’exécuter le script python depuis le dossier \texttt{python} :
 \begin{center}
@@ -898,7 +912,7 @@ Pour allumer le serveur, il suffit d’exécuter le script python depuis le doss
 \end{center}
 En cas de problème de port déjà occupé, il peut être changé aux lignes suivantes \texttt{lara/src/main/java/org/lara/rnn/\\Server.java:11} (côté client) et \texttt{python/main.py:70} (côté serveur).
 \subsubsection{Second terminal : le client}
-Il suffit d'utiliser maven pour appeler le script JavaFX :
+Il suffit d'utiliser Maven pour appeler le script JavaFX :
 \begin{center}
 	\texttt{\$ mvn javafx:run}
 \end{center}
